@@ -10,7 +10,7 @@ function onLoad() {
     const katex = require(`${plugin_path}/src/lib/markdown-it-katex.js`);
     const pangu = require(`${plugin_path}/src/lib/markdown-it-pangu.js`)
     const mark = require(`${plugin_path}/src/lib/markdown-it.js`)({
-        html: false, // 在源码中启用 HTML 标签
+        html: true, // 在源码中启用 HTML 标签
         xhtmlOut: true, // 使用 '/' 来闭合单标签 （比如 <br />）。
         // 这个选项只对完全的 CommonMark 模式兼容。
         breaks: true, // 转换段落里的 '\n' 到 <br>。
