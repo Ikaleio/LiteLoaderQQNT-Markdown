@@ -27,13 +27,6 @@ function render() {
             const posBase = document.createElement('span')
             spanElem[0].before(posBase)
 
-            // 移除旧元素
-            spanElem
-                .filter((e) => messageBox.hasChildNodes(e))
-                .forEach((e) => {
-                    messageBox.removeChild(e)
-                })
-
             // 对于纯文本，应该拿出 innerHTML。这不会发生 XSS 注入，因为 QQ 自身已经进行了转义
             // 对于表情，at 信息等消息，生成占位标签，并在结束后使用原元素进行替换（避免markdownit渲染内容）
             const markPieces = spanElem.map((msgPiece, index) => {
@@ -60,6 +53,13 @@ function render() {
             const marks = markPieces.map((p) => p.mark).reduce((acc, p) => acc + p, "")
             const renderedHtml = await markdown_it.render(marks)
 
+            // 移除旧元素
+            spanElem
+                .filter((e) => messageBox.hasChildNodes(e))
+                .forEach((e) => {
+                    messageBox.removeChild(e)
+                })
+            
             // 将原有元素替换回内容
             const markdownBody = document.createElement('div')
             markdownBody.innerHTML = renderedHtml
@@ -84,7 +84,6 @@ function render() {
 
             // 放回内容
             Array.from(markdownBody.childNodes)
-                .map((node) => node)
                 .forEach((elem) => {
                     posBase.before(elem)
                 })
