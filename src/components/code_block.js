@@ -5,21 +5,22 @@ import { unescapeHtml, escapeHtml } from '@/utils/htmlProc';
 import { useSettingsStore } from '@/states/settings';
 
 export function HighLightedCodeBlock({ content, lang, markdownItIns }) {
+
     if (!lang || !hljs.getLanguage(lang)) {
         lang = 'plaintext';
     }
 
-    const settings = useSettingsStore((state) => state)
+    console.debug(`[Markdown-it] Inside Fenced Code, unescapeBeforeHighlight=${useSettingsStore.getState().unescapeBeforeHighlight}`);
 
     function contentPreprocess(input) {
 
         // if unescapeAll has enabled, unescape code content again may cause display error
         // so here we should force skip unescape process and ignore user settings.
-        if (settings.forceUnescapeBeforeHighlight() === false) {
+        if (useSettingsStore.getState().forceUnescapeBeforeHighlight() === false) {
             return input;
         }
 
-        if (settings.unescapeBeforeHighlight === true) {
+        if (useSettingsStore.getState().unescapeBeforeHighlight === true) {
             return unescapeHtml(input);
         }
 
@@ -29,28 +30,26 @@ export function HighLightedCodeBlock({ content, lang, markdownItIns }) {
     var Finalcontent = "";
     try {
         Finalcontent = hljs.highlight(contentPreprocess(content), { language: lang, ignoreIllegals: true }).value;
-    } catch (e) { }
+    } catch (e) {
+        console.debug(`[Markdown-it] hljs error: ${e}`);
+     }
 
     return (<pre className='hljs hl-code-block'>
         <code dangerouslySetInnerHTML={{ __html: Finalcontent }}></code>
     </pre>);
 }
 
-export function renderInlineCodeBlockString(tokens, idx, slf) {
+export function renderInlineCodeBlockString(tokens, idx, options, env, slf) {
+    var token = tokens[idx];
 
-    const settings = useSettingsStore((state) => state);
-
-    function contentPreprocess(input) {
-
-        if (settings.unescapeAllHtmlEntites === true) {
-            return escapeHtml(input);
-        }
-
-        return input;
+    if (useSettingsStore.getState().unescapeAllHtmlEntites === true) {
+        console.debug(`[Markdown-it] Inside Inline Render: escape=true`);
+        token.content = escapeHtml(token.content);
     }
+    console.debug(`[Markdown-it] Inside Inline Render: escape=false`);
 
-    const token = tokens[idx]
+
     return '<code' + slf.renderAttrs(token) + '>' +
-        contentPreprocess(token.content) +
+        token.content +
         '</code>';
 }

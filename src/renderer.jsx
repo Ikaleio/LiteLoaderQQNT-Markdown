@@ -53,9 +53,8 @@ function generateMarkdownIns() {
         highlight: function (str, lang) {
             return (renderToString(<HighLightedCodeBlock content={str} lang={lang} markdownItIns={localMarkdownItIns} />));
         },
-
-        code_inline: renderInlineCodeBlockString,
     }).use(katex);
+    localMarkdownItIns.renderer.rules.code_inline = renderInlineCodeBlockString;
     markdownItIns = localMarkdownItIns;
     return localMarkdownItIns;
 }
