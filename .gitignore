@@ -2,3 +2,6 @@ node_modules/
 
 # ignore user settings file
 settings.json
+
+# ignore dist/
+dist

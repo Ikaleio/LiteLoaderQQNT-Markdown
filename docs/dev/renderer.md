@@ -6,7 +6,7 @@ Markdwon rendering task has been moved to Renderer process.
 
 ## Bundling
 
-All code in Renderer process has been bundled to `dist/renderer.js` using `webpack`. To ensure that users can start using this extension directly after executing `git clone`, this bundled file should be included in `git`.
+All code in Renderer process has been bundled to `dist/renderer.js` using `webpack`.
 
 Before start developing, run `npm install` to get all dependencies.
 
@@ -24,7 +24,7 @@ module.exports = {
 
 > Remember to change mode back to `production` when bundling release version.
 
-## UI Development
+# UI Development
 
 You could use `React` to develop plugin settings UI interface.
 
@@ -41,7 +41,7 @@ Currently only `.js` file extension is supported, using `.jsx` may cause webpack
 
 > This might be solved by provide custom package resolve rules to webpack but I didn't look into it.
 
-## Renderer Test
+# Content Rendering Test Example
 
 You could use Markdown below as a quick Markdown Rendering Test.
 
