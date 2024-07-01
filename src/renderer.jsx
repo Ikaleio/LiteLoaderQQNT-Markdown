@@ -187,7 +187,7 @@ function onLoad() {
     const plugin_path = LiteLoader.plugins.markdown_it.path.plugin;
 
     loadCSSFromURL(`local:///${plugin_path}/src/style/markdown.css`);
-    loadCSSFromURL(`local:///${plugin_path}/src/style/katex.css`);
+    // loadCSSFromURL(`local:///${plugin_path}/src/style/katex.css`);
     loadCSSFromURL(`local:///${plugin_path}/src/style/hljs-github-dark.css`, 'github-hl-dark');
     loadCSSFromURL(`local:///${plugin_path}/src/style/hljs-github.css`, 'github-hl-adaptive');
 

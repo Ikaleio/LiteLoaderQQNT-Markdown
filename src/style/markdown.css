@@ -103,3 +103,7 @@ span>p>img {
 pre.hl-code-block {
     border-radius: 5px;
 }
+
+span.katex-html[aria-hidden] {
+    display: none;
+}

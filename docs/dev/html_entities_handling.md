@@ -23,3 +23,59 @@ One option to accomplish this without being vulnerable to an XSS exploit is to f
 When HTML rendering enabled, all HTML Entities will be unescaped at the beginning, then passed to Markdown It renderer. In this case, the fenced code block shall NOT unescape the received code again (which may cause HTML entities render error).
 
 Finally, using `DOMPurify.sanitize()` to filter all possible malicious tags, then rendering content back to message box.
+
+# Latex Rendering with HTML Entities
+
+Version `<=1.1.0` may experience rendering issue when Inline Latex and Latex Block which contains HTML Entities. The reason is same as above: HTML Entities has been escaped.
+
+In above when solving Fenced Code Rendering issue, we manually unescaped HTML Entities in function that passed to `highlight`. However there is no any method we could "plug-in" our code to MarkdownIt Katex plugin.
+
+One possible method (not so elegant though) is to apply some mild changes to `katex` plugin itself as below:
+
+```js
+// Add this function to katex/index.js
+function unescapeHtml(unsafe) {
+    return unsafe
+        .replace(/&amp;/g, "\&")
+        .replace(/&lt;/g, "\<")
+        .replace(/&gt;/g, "\>")
+        .replace(/&quot;/g, "\"")
+        .replace(/&#039;/g, "\'");
+}
+
+// set KaTeX as the renderer for markdown-it-simplemath
+var katexInline = function (latex) {
+    latex = unescapeHtml(latex); // Add this line. Work with QQNT Markdown-it
+    options.displayMode = false;
+    try {
+        return katex.renderToString(latex, options);
+    }
+    catch (error) {
+        if (options.throwOnError) { console.log(error); }
+        return `<span class='katex-error' title='${escapeHtml(error.toString())}'>${escapeHtml(latex)}</span>`;
+    }
+};
+
+var inlineRenderer = function (tokens, idx) {
+    return katexInline(tokens[idx].content);
+};
+
+var katexBlock = function (latex) {
+    latex = unescapeHtml(latex); // Add this line. Work with QQNT Markdown-it
+    options.displayMode = true;
+    try {
+        return `<p class="katex-block ${options.blockClass}">` + katex.renderToString(latex, options) + "</p>";
+    }
+    catch (error) {
+        if (options.throwOnError) { console.log(error); }
+        return `<p class='katex-block katex-error ${options.blockClass
+            }' title='${escapeHtml(error.toString())}'>${escapeHtml(latex)}</p>`;
+    }
+}
+```
+
+In case that latex has been rendered successfully, all possible HTML Entities has been converted to latex span.
+
+When error occurred while rendering latex, the raw info will go through `escapeHtml()` before rendering, so in both case there is no XSS vulnurability.
+
+> You don't need to do anything if you are user of thie plugin since all changes has been bundled into `dist/renderer.js`. However if you are going to develop this plugin, remember to manually apply changes above into `@traptitech/katex` package.
