@@ -35,3 +35,22 @@ export function HighLightedCodeBlock({ content, lang, markdownItIns }) {
         <code dangerouslySetInnerHTML={{ __html: Finalcontent }}></code>
     </pre>);
 }
+
+export function renderInlineCodeBlockString(tokens, idx, slf) {
+
+    const settings = useSettingsStore((state) => state);
+
+    function contentPreprocess(input) {
+
+        if (settings.unescapeAllHtmlEntites === true) {
+            return escapeHtml(input);
+        }
+
+        return input;
+    }
+
+    const token = tokens[idx]
+    return '<code' + slf.renderAttrs(token) + '>' +
+        contentPreprocess(token.content) +
+        '</code>';
+}
