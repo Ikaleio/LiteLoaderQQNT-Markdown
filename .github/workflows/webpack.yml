@@ -28,5 +28,5 @@ jobs:
         npm run release
     - uses: actions/upload-artifact@v4
       with:
-        name: Release.zip
-        path: release.zip
+        name: Release
+        path: /
