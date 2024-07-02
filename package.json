@@ -13,7 +13,7 @@
     },
     "scripts": {
         "build": "webpack",
-        "release": "git archive -o release.zip HEAD && zip -r release.zip . -i dist"
+        "release": "git archive -o release.zip HEAD && zip -r release.zip dist"
     },
     "devDependencies": {
         "@babel/core": "^7.24.7",

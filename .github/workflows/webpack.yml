@@ -25,8 +25,9 @@ jobs:
     - name: Build
       run: |
         npm install
+        npm run build
         npm run release
     - uses: actions/upload-artifact@v4
       with:
         name: Release
-        path: /
+        path: release.zip
