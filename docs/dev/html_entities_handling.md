@@ -2,7 +2,7 @@ Since this plugin retrieve user's text data by using HTML element's `innerHTML` 
 
 # Rendering Blockquote
 
-For blockquote rendering issue, one work around is to unescape all `&gt;` back to `>` in the string. Doing this could enable Markdown It renderer to regconize blockquote format, and since only `>` has been unescaped, this action should not imposed any XSS vulnurability.
+For blockquote rendering issue, one work around is to unescape all `&gt;` back to `>` in the string. Doing this could enable Markdown It renderer to regconize blockquote format, and since only `>` has been unescaped, this action should not impose any XSS vulnurability.
 
 # Rendering Fenced Code Block
 
@@ -12,7 +12,7 @@ Here we first call `unescapeHtml()` to unescape all HTML Entities in the fenced 
 
 > Here different from previous approach, when we cannot detect the language, use `plaintext` as the `lang` param and pass it to highlight.js instead of using escaped string as result. 
 > 
-> This could ensure all dangerous HTML string (unescaped string) has go throught highlight.js before being rendered on UI even if it's not in the support language list, and could also avoid HTML entities render error in some case.
+> This could ensure all dangerous HTML string (unescaped string) has go through highlight.js before being rendered on UI even if it's not in the support language list, and could also avoid HTML entities render error in some case.
 
 # Rendering Custom HTML
 
