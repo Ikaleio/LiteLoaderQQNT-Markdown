@@ -7,7 +7,7 @@ React.createRoot = createRoot;
 import { SettingPage } from "./components/setting_page";
 const hljs = require('highlight.js');
 import markdownIt from 'markdown-it';
-import katex from '@traptitech/markdown-it-katex';
+import katex from '@/lib/markdown-it-katex';
 
 import { escapeHtml, purifyHtml, unescapeHtml } from '@/utils/htmlProc';
 
