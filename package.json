@@ -1,12 +1,10 @@
 {
     "dependencies": {
-        "@traptitech/markdown-it-katex": "^3.6.0",
         "dompurify": "^3.1.5",
         "highlight.js": "^11.9.0",
-        "idb-keyval": "^6.2.1",
         "immer": "^10.1.1",
+        "katex": "^0.16.10",
         "markdown-it": "^14.1.0",
-        "markdown-it-pangu": "^1.0.2",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "zustand": "^4.5.4"
