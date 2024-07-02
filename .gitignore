@@ -5,3 +5,4 @@ settings.json
 
 # ignore dist/
 dist
+release.zip
