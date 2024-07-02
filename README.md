@@ -6,12 +6,12 @@
 
 ![](https://raw.githubusercontent.com/d0j1a1701/LiteLoaderQQNT-Markdown/main/screenshots/1.png)
 
-## Features
+## 功能
 
 - 标准 Markdown 语法；
-- 基于 $KaTeX$ 的公式渲染；
+- 基于 [KaTeX](https://katex.org/) 的 $\LaTeX$ 公式渲染；
 
 ## 注意事项
 
-- 本插件正处于测试阶段，若无法使用请积极发 issue，发 issue 时带上系统版本，插件列表和 LiteLoaderQQNT 设置中所示的版本信息。
-- 该插件无须`npm install`，所有依赖已经通过`webpack`打包内置，`package.json`只是便于开发。
+- 若发生了任何不好的事情请积极发 issue，发 issue 时带上系统版本，插件列表和 LiteLoaderQQNT 设置中所示的版本信息。
+- 使用 `npm run release` 以生成可加载的插件，如果你不是开发者请直接下载 Release。
