@@ -12,7 +12,7 @@ import katex from '@traptitech/markdown-it-katex';
 import { escapeHtml, purifyHtml, unescapeHtml } from '@/utils/htmlProc';
 
 // Components
-import { HighLightedCodeBlock } from './components/code_block';
+import { HighLightedCodeBlock, renderInlineCodeBlockString } from './components/code_block';
 
 // States
 import { useSettingsStore } from '@/states/settings';
@@ -52,8 +52,9 @@ function generateMarkdownIns() {
         // 如果结果以 <pre ... 开头，内部包装器则会跳过。
         highlight: function (str, lang) {
             return (renderToString(<HighLightedCodeBlock content={str} lang={lang} markdownItIns={localMarkdownItIns} />));
-        }
+        },
     }).use(katex);
+    localMarkdownItIns.renderer.rules.code_inline = renderInlineCodeBlockString;
     markdownItIns = localMarkdownItIns;
     return localMarkdownItIns;
 }

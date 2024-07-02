@@ -1,14 +1,12 @@
-Markdwon rendering task has been moved to Renderer process.
+Markdown rendering task has been moved to Renderer process.
 
+# Introduction
 
+## Bundling Using Webpack
 
-# Development
-
-## Bundling
-
-All code in Renderer process has been bundled to `dist/renderer.js` using `webpack`. To ensure that users can start using this extension directly after executing `git clone`, this bundled file should be included in `git`.
-
-Before start developing, run `npm install` to get all dependencies.
+All markdown rendering business is inside Renderer Process currently, 
+and all code in Renderer process has been bundled to `dist/renderer.js` using `webpack`. 
+So before start developing, run `npm install` to get all dependencies.
 
 For a better dev experience, you could change the webpack config:
 
@@ -24,9 +22,22 @@ module.exports = {
 
 > Remember to change mode back to `production` when bundling release version.
 
-## UI Development
+## Create Release Version
 
-You could use `React` to develop plugin settings UI interface.
+`dist` directory is not included in `git`, to create a release version of this extension, please run:
+
+```shell
+npm run release
+```
+
+This script will:
+
+- First use `git archive` to create a `release.zip` file contains all code included in `git`.
+- Use `zip -r` to add `dist` directory into previously generated `release.zip`.
+
+# UI Development
+
+You could use `React` to develop plugin settings UI interface. The entrance of user settings page is `src/components/setting_page.js`
 
 ```js
 // react_component_file.js
@@ -40,3 +51,56 @@ export function YourComponentHere(){
 Currently only `.js` file extension is supported, using `.jsx` may cause webpack package resolve error.
 
 > This might be solved by provide custom package resolve rules to webpack but I didn't look into it.
+
+# Content Rendering Test Example
+
+You could use Markdown below as a quick Markdown Rendering Test.
+
+    # Display Test
+
+    ## Normal
+
+    Normal test
+
+    Normal test with HTML Entities & " ' < > .
+
+    ## List 
+
+    - List Item
+    - List Item
+
+    1. Ordered List
+    2. Ordered List
+
+    ## Blockquote
+
+    > Test
+    >
+    >> Nested Test
+
+    ## Code
+
+    Inline Code test `int main(){ return 0; }`
+
+    Inline Code test with HTML Entities: `<p>Hello!</p>`
+
+    ```
+    // Cpp Code Test
+    #include <iostream>
+    int a = 0;
+    int& b = a;
+    ```
+
+    ```
+    Plain text with HTML Entities <p>Hello</p>
+    ```
+
+    ## LaTeX
+
+    $$
+    \displaystyle \left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)
+    $$
+
+Example Output Screenshot:
+
+![image](https://github.com/nfnfgo/LiteLoaderQQNT-Markdown/assets/61616918/79a80462-12f1-4008-9d20-7b029661c000)
