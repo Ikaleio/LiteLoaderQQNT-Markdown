@@ -127,15 +127,21 @@ function render() {
                     return {
                         mark: `<span id="${id}"></span>`,
                         replace: (parent) => {
-                            const oldNode = parent.querySelector(`#${id}`)
-                            oldNode.replaceWith(msgPiece)
+                            try {
+                                // here oldNode may be `undefined`
+                                // Plugin will broke without this try catch block.
+                                const oldNode = parent.querySelector(`#${id}`);
+                                oldNode.replaceWith(msgPiece);
+                            } catch (e) {
+                                ;
+                            }
                         }
                     }
                 }
             });
 
             // 渲染 markdown
-            const marks = markPieces.map((p) => p.mark).reduce((acc, p) => acc + p, "")
+            const marks = markPieces.map((p) => p.mark).reduce((acc, p) => acc + p, "");
             var renderedHtml = renderedHtmlProcessor(await generateMarkdownIns().render(marks))
 
             // 移除旧元素
@@ -147,7 +153,8 @@ function render() {
 
             // 将原有元素替换回内容
             const markdownBody = document.createElement('div');
-            markdownBody.innerHTML = renderedHtml;
+            // some themes rely on this class to render 
+            markdownBody.innerHTML = `<div class="text-normal">${renderedHtml}</div>`;
             markPieces.filter((p) => p.replace != null)
                 .forEach((p) => {
                     p.replace(markdownBody)
@@ -194,7 +201,7 @@ function loadCSSFromURL(url, id) {
 
 onLoad();
 
-function onLoad() {
+function _onLoad() {
     const settings = useSettingsStore.getState();
     const plugin_path = LiteLoader.plugins.markdown_it.path.plugin;
 
@@ -217,7 +224,12 @@ function onLoad() {
     const observer = new MutationObserver((mutationsList) => {
         for (let mutation of mutationsList) {
             if (mutation.type === "childList") {
-                render();
+                // avoid error in render break users QQNT.
+                try { render(); }
+                catch (e) {
+                    ;
+                }
+
             }
         }
     });
@@ -227,6 +239,15 @@ function onLoad() {
     observer.observe(targetNode, config);
 }
 
+function onLoad() {
+    try {
+        console.log('[MarkdownIt] OnLoad() triggered');
+        return _onLoad();
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 // 打开设置界面时触发
 function onSettingWindowCreated(view) {
     var root = React.createRoot(view);
@@ -234,6 +255,7 @@ function onSettingWindowCreated(view) {
 }
 
 export {
-    onSettingWindowCreated
+    onSettingWindowCreated,
+    onLoad,
 }
 
