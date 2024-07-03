@@ -24,13 +24,13 @@ When HTML rendering enabled, all HTML Entities will be unescaped at the beginnin
 
 Finally, using `DOMPurify.sanitize()` to filter all possible malicious tags, then rendering content back to message box.
 
-# Latex Rendering with HTML Entities
+# LaTeX Rendering with HTML Entities
 
 Version `<=1.1.0` may experience rendering issue when Inline Latex and Latex Block which contains HTML Entities. The reason is same as above: HTML Entities has been escaped.
 
 In above when solving Fenced Code Rendering issue, we manually unescaped HTML Entities in function that passed to `highlight`. However there is no any method we could "plug-in" our code to MarkdownIt Katex plugin.
 
-One possible method (not so elegant though) is to apply some mild changes to `katex` plugin itself as below:
+To solve this, we need to use a mild modified version of `markdown-it-katex`, the midification has been described below:
 
 ```js
 // Add this function to katex/index.js
@@ -74,11 +74,9 @@ var katexBlock = function (latex) {
 }
 ```
 
-In case that latex has been rendered successfully, all possible HTML Entities has been converted to latex span.
+In case that latex has been rendered successfully, all possible HTML Entities has been converted to latex span. And wzhen error occurred while rendering latex, the raw info will go through `escapeHtml()` before rendering, so in both case there is no XSS vulnurability.
 
-When error occurred while rendering latex, the raw info will go through `escapeHtml()` before rendering, so in both case there is no XSS vulnurability.
-
-> You don't need to do anything if you are user of thie plugin since all changes has been bundled into `dist/renderer.js`. However if you are going to develop this plugin, remember to manually apply changes above into `@traptitech/katex` package.
+The relavant script has been directly added to this git repo now as `src/lib/markdown-it-katex.js`.
 
 # Inline Code Rendering with HTML Entities
 
