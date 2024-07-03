@@ -101,7 +101,8 @@ span>p>img {
 }
 
 /* Border radius for fenced code block */
-pre.hl-code-block {
+pre.hl-code-block,
+div.katex-block-rendered {
     position: relative;
     min-width: 5rem;
     min-height: 2rem;
@@ -109,7 +110,9 @@ pre.hl-code-block {
 }
 
 /* language and copy button style */
-pre.hl-code-block>button.lang_copy {
+pre.hl-code-block>button.lang_copy,
+div.katex-block-rendered>button.copy_latex {
+    z-index: 10;
     position: absolute;
     right: 2px;
     top: 2px;
@@ -125,26 +128,32 @@ pre.hl-code-block>button.lang_copy {
     transition-duration: 20ms;
 }
 
-pre.hl-code-block>button.lang_copy:active {
+pre.hl-code-block>button.lang_copy:active,
+div.katex-block-rendered>button.copy_latex:active {
     transform: scale(0.85);
 }
 
 
 @media(prefers-color-scheme: light) {
-    pre.hl-code-block>button.lang_copy {
+
+    pre.hl-code-block>button.lang_copy,
+    div.katex-block-rendered>button.copy_latex {
         background-color: rgba(255, 255, 255, 0.5);
         color: black;
     }
 }
 
 @media(prefers-color-scheme: dark) {
-    pre.hl-code-block>button.lang_copy {
+
+    pre.hl-code-block>button.lang_copy,
+    div.katex-block-rendered>button.copy_latex {
         background-color: rgba(0, 0, 0, 0.5);
         color: white;
     }
 }
 
-pre.hl-code-block:not(:hover)>button.lang_copy {
+pre.hl-code-block:not(:hover)>button.lang_copy,
+div.katex-block-rendered:not(:hover)>button.copy_latex {
     display: none;
 }
 

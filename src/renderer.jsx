@@ -15,7 +15,8 @@ import { escapeHtml, purifyHtml, unescapeHtml } from '@/utils/htmlProc';
 import {
     HighLightedCodeBlock,
     addOnClickHandleForCopyButton,
-    renderInlineCodeBlockString
+    renderInlineCodeBlockString,
+    addOnClickHandleForLatexBlock
 } from './components/code_block';
 
 // States
@@ -154,6 +155,9 @@ function render() {
 
             // Handle click of Copy Code Button
             addOnClickHandleForCopyButton(markdownBody);
+
+            // Handle click of Copy Latex Button
+            addOnClickHandleForLatexBlock(markdownBody);
 
             // 在外部浏览器打开连接
             markdownBody.querySelectorAll("a").forEach((e) => {

@@ -77,3 +77,24 @@ export function addOnClickHandleForCopyButton(element) {
             }
         });
 }
+
+/**
+ * Find all Copy Button of Latex block and add hanlder to it.
+ * 
+ * @param {HTMLElement} element 
+ */
+export function addOnClickHandleForLatexBlock(element) {
+    var buttons = element.querySelectorAll('div.katex-block-rendered>button.copy_latex');
+
+
+    Array.from(buttons)
+        .forEach(function (copyButton) {
+            try {
+                // find tex annotation
+                var latexAnno = copyButton.parentElement.querySelector('annotation[encoding="application/x-tex"]').textContent;
+                copyButton.onclick = () => { navigator.clipboard.writeText(latexAnno) };
+            } catch (e) {
+                ;
+            }
+        });
+}
