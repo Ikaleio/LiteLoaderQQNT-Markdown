@@ -27,7 +27,7 @@ jobs:
         npm install
         npm run build
         npm run release
-        rm release.zip
+        rm ./release.zip
     - uses: actions/upload-artifact@v4
       with:
         name: Release
