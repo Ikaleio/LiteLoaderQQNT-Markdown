@@ -12,7 +12,11 @@ import katex from '@/lib/markdown-it-katex';
 import { escapeHtml, purifyHtml, unescapeHtml } from '@/utils/htmlProc';
 
 // Components
-import { HighLightedCodeBlock, renderInlineCodeBlockString } from './components/code_block';
+import {
+    HighLightedCodeBlock,
+    addOnClickHandleForCopyButton,
+    renderInlineCodeBlockString
+} from './components/code_block';
 
 // States
 import { useSettingsStore } from '@/states/settings';
@@ -147,6 +151,9 @@ function render() {
                 .forEach((p) => {
                     p.replace(markdownBody)
                 })
+
+            // Handle click of Copy Code Button
+            addOnClickHandleForCopyButton(markdownBody);
 
             // 在外部浏览器打开连接
             markdownBody.querySelectorAll("a").forEach((e) => {
