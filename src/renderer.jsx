@@ -16,7 +16,8 @@ import {
     HighLightedCodeBlock,
     addOnClickHandleForCopyButton,
     renderInlineCodeBlockString,
-    addOnClickHandleForLatexBlock
+    addOnClickHandleForLatexBlock,
+    changeDirectionToColumnWhenLargerHeight
 } from './components/code_block';
 
 // States
@@ -185,7 +186,9 @@ function render() {
                 .forEach((elem) => {
                     posBase.before(elem)
                 })
-            messageBox.removeChild(posBase)
+            messageBox.removeChild(posBase);
+
+            changeDirectionToColumnWhenLargerHeight();
 
         })
 
