@@ -167,10 +167,6 @@ function render() {
             // Handle click of Copy Latex Button
             addOnClickHandleForLatexBlock(markdownBody);
 
-            changeDirectionToColumnWhenLargerHeight();
-
-
-
             // 在外部浏览器打开连接
             markdownBody.querySelectorAll("a").forEach((e) => {
                 e.classList.add("markdown_it_link");
@@ -190,7 +186,9 @@ function render() {
                 .forEach((elem) => {
                     posBase.before(elem)
                 })
-            messageBox.removeChild(posBase)
+            messageBox.removeChild(posBase);
+
+            changeDirectionToColumnWhenLargerHeight();
 
         })
 
