@@ -164,3 +164,12 @@ pre.hl-code-block>button.lang_copy:hover>p.lang {
 pre.hl-code-block>button.lang_copy:not(:hover)>p.copy {
     display: none;
 }
+
+/* 修复轻量工具箱等插件时间显示多出换行的问题 */
+.mix-message__inner {
+    display: flex;
+}
+
+.lite-tools-slot.embed-slot {
+    flex: none;
+}
