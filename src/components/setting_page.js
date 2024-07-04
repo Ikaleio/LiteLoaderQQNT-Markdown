@@ -147,6 +147,7 @@ function TextAndCaptionBlock({ title, caption }) {
                 data-type='secondary'
                 style={{
                     // "text-wrap": "wrap",
+                    'margin-top': '3px',
                     "word-break": "break-word"
                 }}
             ><p style={{
