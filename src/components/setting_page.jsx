@@ -138,8 +138,8 @@ function TextAndCaptionBlock({ title, caption }) {
     return (
         <div style={{
             'display': 'flex',
-            'flex-wrap': 'wrap',
-            'flex-direction': 'column',
+            'flexWrap': 'wrap',
+            'flexDirection': 'column',
             'width': '92%',
         }}>
             <setting-text>{title}</setting-text>
@@ -147,11 +147,11 @@ function TextAndCaptionBlock({ title, caption }) {
                 data-type='secondary'
                 style={{
                     // "text-wrap": "wrap",
-                    'margin-top': '3px',
-                    "word-break": "break-word"
+                    'marginTop': '3px',
+                    "wordBreak": "break-word"
                 }}
             ><p style={{
-                'overflow-y': 'scroll',
+                'overflowY': 'scroll',
             }}>{caption}</p></setting-text>
         </div>
     );
