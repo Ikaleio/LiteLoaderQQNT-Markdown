@@ -98,3 +98,13 @@ export function addOnClickHandleForLatexBlock(element) {
             }
         });
 }
+
+export function changeDirectionToColumnWhenLargerHeight() {
+    var msgBlocks = document.querySelectorAll('.mix-message__inner');
+    Array.from(msgBlocks).forEach(function (block) {
+        var height = block.offsetHeight;
+        if (height > 30) {
+            block.style.flexDirection = 'column';
+        }
+    });
+}

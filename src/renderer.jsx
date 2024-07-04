@@ -16,7 +16,8 @@ import {
     HighLightedCodeBlock,
     addOnClickHandleForCopyButton,
     renderInlineCodeBlockString,
-    addOnClickHandleForLatexBlock
+    addOnClickHandleForLatexBlock,
+    changeDirectionToColumnWhenLargerHeight
 } from './components/code_block';
 
 // States
@@ -165,6 +166,10 @@ function render() {
 
             // Handle click of Copy Latex Button
             addOnClickHandleForLatexBlock(markdownBody);
+
+            changeDirectionToColumnWhenLargerHeight();
+
+
 
             // 在外部浏览器打开连接
             markdownBody.querySelectorAll("a").forEach((e) => {
