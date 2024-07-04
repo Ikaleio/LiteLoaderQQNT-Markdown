@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
 
@@ -27,8 +27,9 @@ jobs:
         npm install
         npm run build
         npm run release
-        rm ./release.zip
+        unzip release.zip -d ./artifact_content
+        rm release.zip
     - uses: actions/upload-artifact@v4
       with:
         name: Release
-        path: ./
+        path: ./artifact_content/

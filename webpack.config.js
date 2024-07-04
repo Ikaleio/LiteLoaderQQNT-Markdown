@@ -7,7 +7,9 @@ module.exports = {
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "src"),
-        }
+        },
+        // Explicitly resolve files with following extension as modules.
+        extensions: ['', '.js', '.jsx', '.ts', '.tsx'],
     },
     experiments: {
         outputModule: true,
@@ -31,8 +33,22 @@ module.exports = {
                     loader: "babel-loader",
                     options: {
                         presets: [
-                            '@babel/preset-env',
-                            '@babel/react',
+                            '@babel/preset-react',
+
+                        ],
+                    }
+                },
+            },
+            {
+                test: /.(ts|tsx)$/,
+                include: path.resolve(__dirname, "src"),
+                exclude: /node_modules/,
+                use: {
+                    loader: "babel-loader",
+                    options: {
+                        presets: [
+                            '@babel/preset-typescript',
+                            '@babel/preset-react',
                         ],
                     }
                 },

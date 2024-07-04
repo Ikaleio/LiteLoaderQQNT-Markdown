@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "noImplicitAny": true,
+        "jsx": "react",
+        "allowJs": true,
+    },
+    "exclude": [
+        "./dist/**/*" // This is what fixed it!
+    ]
+}

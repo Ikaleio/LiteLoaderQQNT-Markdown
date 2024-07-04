@@ -2,19 +2,20 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
 import { persist, createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
+import { LiteLoaderStorage } from '@/utils/liteloaderConfig';
 
-// Custom storage object, used by ipcRenderer zustand storage.
-const storage = {
-    getItem: async (name) => {
-        return (await markdown_it.get_settings(name)) || null
-    },
-    setItem: async (name, value) => {
-        await markdown_it.update_settings({ name, value });
-    },
-    removeItem: async (name) => {
-        await markdown_it.remove_settings(name);
-    },
-}
+// // Custom storage object, used by ipcRenderer zustand storage.
+// const storage = {
+//     getItem: async (name) => {
+//         return (await markdown_it.get_settings(name)) || null
+//     },
+//     setItem: async (name, value) => {
+//         await markdown_it.update_settings({ name, value });
+//     },
+//     removeItem: async (name) => {
+//         await markdown_it.remove_settings(name);
+//     },
+// }
 
 /**
  * forcefieldName() method is used to return the value indicating the setting  
@@ -59,8 +60,8 @@ export const useSettingsStore = create(
             }
         }))),
         {
-            name: 'markdownit_settings',
-            storage: createJSONStorage(() => storage),
+            name: 'state/settings',
+            storage: LiteLoaderStorage,
         }
     ),
 )
