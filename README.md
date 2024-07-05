@@ -6,7 +6,7 @@
 
 ## 简介
 
-这是一个 [LiteLoaderQQNT](https://github.com/mo-jinran/LiteLoaderQQNT) 插件，使用 [Markdown-it](https://github.com/markdown-it/markdown-it) 为 QQNT 增加 Markdown 和 $\LaTeX$ 以及HTML渲染功能！
+这是一个 [LiteLoaderQQNT](https://github.com/mo-jinran/LiteLoaderQQNT) 插件，使用 [Markdown-it](https://github.com/markdown-it/markdown-it) 为 QQNT 增加 Markdown 和 $\LaTeX$ 以及 HTML渲染功能！
 
 ## 安装本插件
 
@@ -47,7 +47,6 @@ Normal test with HTML Entities & " ' < > .
 ### 代码块渲染和高亮
 
 
-
 ![image](https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/assets/61616918/22acdfa7-a033-4269-839c-04ca829f0a5a)
 
 <details><summary>对应消息原文本</summary>
@@ -80,6 +79,31 @@ Normal test with HTML Entities & " ' < > .
 
 </details>
 
+### 支持第三方主题
+
+![image](https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/assets/48874489/be3b2aff-e69d-4655-aab6-912632b9d51c)
+
+图中的主题是 [MUKAPP/LiteLoaderQQNT-MSpring-Theme](https://github.com/MUKAPP/LiteLoaderQQNT-MSpring-Theme)。
+
+<details><summary>对应消息原文本</summary>
+
+    # Markdown test
+    `inline code test`
+    **加粗**~~删除~~__下划线__
+    [这是个链](https://d0j1a1701.cc)
+    $\LaTeX \color{red}{red text}$
+    ```cpp
+    #include <iostream>
+    using namespace std;
+    int main(){
+        cout << "Meow" << endl;
+        return 0;
+    }
+    ```
+    > This is a quote test.
+
+</details>
+
 ## 注意事项
 
-- 如果在使用插件时遇到问题，您可以通过 [发起 Issue](https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/issues/new) 向我们进行反馈。届时请尽可能附上诸如系统版本，插件列表， LiteLoaderQQNT 设置页版本信息截图等可以帮助分析问题的信息。
+- 如果在使用插件时遇到问题，您可以通过 [发起 Issue](https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/issues/new) 向我们进行反馈。届时请尽可能附上诸如系统版本，插件列表， LiteLoaderQQNT 设置页版本信息截图等可以帮助分析问题的信息。如果你还安装了远程调试插件，可以再附上 Devtools 信息。
