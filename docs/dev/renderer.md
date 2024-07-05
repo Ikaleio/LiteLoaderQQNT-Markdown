@@ -1,6 +1,10 @@
-Markdown rendering task has been moved to Renderer process.
+![React](https://img.shields.io/badge/React-blue?style=for-the-badge&logo=react&logoColor=white)![JavaScript](https://img.shields.io/badge/JavaScript-yellow?style=for-the-badge&logo=javascript&logoColor=white)![Typescript](https://img.shields.io/badge/TypeScript-blue?style=for-the-badge&logo=typescript&logoColor=white)![Webpack](https://img.shields.io/badge/Webpack-grey?style=for-the-badge&logo=react&logoColor=white)
+
+
 
 # Introduction
+
+For how to clone and build this project, checkout the third method mentioned in [Installation Guide](/docs/plug_install.md)
 
 ## Bundling Using Webpack
 
