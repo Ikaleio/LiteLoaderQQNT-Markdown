@@ -4,7 +4,7 @@
 ![Webpack](https://img.shields.io/badge/Webpack-grey?style=for-the-badge&logo=react&logoColor=white)
 
 - [Introduction](#introduction)
-  - [Bundling Using Webpack](#bundling-using-webpack)
+  - [Start Developing](#start-developing)
   - [Create Release Version](#create-release-version)
 - [UI Development](#ui-development)
 - [Content Rendering Test Example](#content-rendering-test-example)
@@ -14,38 +14,36 @@
 
 For how to clone and build this project, checkout the third method mentioned in [Installation Guide](/docs/plug_install.md).
 
-## Bundling Using Webpack
+## Start Developing
 
-All markdown rendering business is inside Renderer Process currently, 
-and all code in Renderer process has been bundled to `dist/renderer.js` using `webpack`. 
-So before start developing, run `npm install` to get all dependencies.
+First of all, run:
 
-For a better dev experience, you could change the webpack config:
-
-```js
-module.exports = {
-
-    watch: true,            // rebundle when file changed
-    mode: 'development',    // enable webpack development mode
-                            // check out https://webpack.js.org/configuration/mode/ for more info.
-    ...// other configs
-};
+```shell
+npm install
 ```
 
-> Remember to change mode back to `production` when bundling release version.
+This will help you get all deps used by this project. Then you can call:
+
+```shell
+npm run dev
+```
+
+This will start `webpack` in watch mode with `development` flag enabled.
+
 
 ## Create Release Version
 
-`dist` directory is not included in `git`, to create a release version of this extension, please run:
+To create a release version of this extension, please run:
 
 ```shell
-npm run release
+npm run release # create Release.zip with ./dist included
 ```
 
-This script will:
+The script `npm run release` will:
 
-- First use `git archive` to create a `release.zip` file contains all code included in `git`.
-- Use `zip -r` to add `dist` directory into previously generated `release.zip`.
+1. Run `npm run build` to generate `./dist` resources.
+2. Run `git archive` to create a `release.zip` file contains all code included in `git`.
+3. Run `zip -r` to add `dist` directory into previously generated `release.zip`.
 
 # UI Development
 
