@@ -1,10 +1,18 @@
-![React](https://img.shields.io/badge/React-blue?style=for-the-badge&logo=react&logoColor=white)![JavaScript](https://img.shields.io/badge/JavaScript-yellow?style=for-the-badge&logo=javascript&logoColor=white)![Typescript](https://img.shields.io/badge/TypeScript-blue?style=for-the-badge&logo=typescript&logoColor=white)![Webpack](https://img.shields.io/badge/Webpack-grey?style=for-the-badge&logo=react&logoColor=white)
+![React](https://img.shields.io/badge/React-blue?style=for-the-badge&logo=react&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-yellow?style=for-the-badge&logo=javascript&logoColor=white)
+![Typescript](https://img.shields.io/badge/TypeScript-blue?style=for-the-badge&logo=typescript&logoColor=white)
+![Webpack](https://img.shields.io/badge/Webpack-grey?style=for-the-badge&logo=react&logoColor=white)
 
+- [Introduction](#introduction)
+  - [Bundling Using Webpack](#bundling-using-webpack)
+  - [Create Release Version](#create-release-version)
+- [UI Development](#ui-development)
+- [Content Rendering Test Example](#content-rendering-test-example)
 
 
 # Introduction
 
-For how to clone and build this project, checkout the third method mentioned in [Installation Guide](/docs/plug_install.md)
+For how to clone and build this project, checkout the third method mentioned in [Installation Guide](/docs/plug_install.md).
 
 ## Bundling Using Webpack
 
