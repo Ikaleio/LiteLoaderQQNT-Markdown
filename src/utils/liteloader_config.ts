@@ -3,20 +3,7 @@ import {
     StateStorage
 } from 'zustand/middleware';
 
-
-/**
- * The interface for QQNT Liteloader dev api.
- * 
- * Notice the `new_config` and `default_config` should all be a Object. Passing string will cause unexpected behaviour.
- */
-interface LiteLoaderInterFace<T> {
-    api: {
-        config: {
-            set(slug: string, new_config: T): Promise<T>;
-            get(slug: string, default_config: T): Promise<T>;
-        }
-    }
-};
+import { LiteLoaderInterFace } from '@/utils/liteloader_type';
 
 declare const LiteLoader: LiteLoaderInterFace<Object>;
 
