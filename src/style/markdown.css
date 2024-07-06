@@ -71,6 +71,12 @@ blockquote {
         text-decoration: underline;
     }
 
+    /* If the link is inside self-sent message, use white text */
+    /* Notice, this solution could work with LiteLoader theme (tested on Windows)*/
+    div.container--self a.markdown_it_link {
+        color: white;
+    }
+
     a.markdown_it_link:hover {
         color: #30a9de;
     }
