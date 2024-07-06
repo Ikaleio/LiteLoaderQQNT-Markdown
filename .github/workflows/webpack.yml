@@ -25,7 +25,6 @@ jobs:
     - name: Build
       run: |
         npm install
-        npm run build
         npm run release
         unzip release.zip -d ./artifact_content
         rm release.zip

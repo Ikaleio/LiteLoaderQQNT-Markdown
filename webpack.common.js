@@ -1,9 +1,5 @@
 const path = require("path");
 module.exports = {
-
-    watch: false,
-    mode: 'production',
-
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "src"),
