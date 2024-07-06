@@ -3,14 +3,13 @@ import hljs from 'highlight.js';
 
 import { unescapeHtml, escapeHtml } from '@/utils/htmlProc';
 import { useSettingsStore } from '@/states/settings';
+import { mditLogger } from "@/utils/logger";
 
 export function HighLightedCodeBlock({ content, lang, markdownItIns }) {
 
     if (!lang || !hljs.getLanguage(lang)) {
         lang = 'plaintext';
     }
-
-    console.debug(`[Markdown-it] Inside Fenced Code, unescapeBeforeHighlight=${useSettingsStore.getState().unescapeBeforeHighlight}`);
 
     function contentPreprocess(input) {
 
@@ -31,7 +30,7 @@ export function HighLightedCodeBlock({ content, lang, markdownItIns }) {
     try {
         Finalcontent = hljs.highlight(contentPreprocess(content), { language: lang, ignoreIllegals: true }).value;
     } catch (e) {
-        console.debug(`[Markdown-it] hljs error: ${e}`);
+        mditLogger('error', `hljs error:`, e);
     }
 
     return (<pre className='hljs hl-code-block'>
@@ -47,10 +46,8 @@ export function renderInlineCodeBlockString(tokens, idx, options, env, slf) {
     var token = tokens[idx];
 
     if (useSettingsStore.getState().unescapeAllHtmlEntites === true) {
-        console.debug(`[Markdown-it] Inside Inline Render: escape=true`);
         token.content = escapeHtml(token.content);
     }
-    console.debug(`[Markdown-it] Inside Inline Render: escape=false`);
 
 
     return '<code' + slf.renderAttrs(token) + '>' +

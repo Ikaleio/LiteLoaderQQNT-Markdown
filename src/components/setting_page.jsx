@@ -10,7 +10,7 @@ export function SettingPage() {
     // use encapsulated <DescriptionTile> and <SwitchSettingTile> whenever possible.
     return (<>
 
-        <setting-section data-title='注意事项'>
+        <setting-section data-title='关于'>
             <setting-panel>
                 <setting-list data-direction='column'>
                     <setting-item data-direction='row'>
@@ -77,6 +77,11 @@ export function SettingPage() {
                 <setting-list data-direction='column'>
 
                     <DescriptionTile title='SettingsState' caption={JSON.stringify(settings, undefined, ' ')} />
+
+                    <SwitchSettingTile
+                        settingName='consoleOutput'
+                        title='控制台输出'
+                        caption='关闭后，将屏蔽 MarkdownIt 插件向控制台输出的信息，目前仅能屏蔽部分信息。' />
 
                     <SwitchSettingTile
                         settingName='unescapeGtInText'

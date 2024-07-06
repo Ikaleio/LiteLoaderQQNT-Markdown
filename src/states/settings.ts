@@ -4,18 +4,36 @@ import { immer } from 'zustand/middleware/immer';
 import { persist, createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
 import { LiteLoaderStorage } from '@/utils/liteloaderConfig';
 
-// // Custom storage object, used by ipcRenderer zustand storage.
-// const storage = {
-//     getItem: async (name) => {
-//         return (await markdown_it.get_settings(name)) || null
-//     },
-//     setItem: async (name, value) => {
-//         await markdown_it.update_settings({ name, value });
-//     },
-//     removeItem: async (name) => {
-//         await markdown_it.remove_settings(name);
-//     },
-// }
+export interface SettingStateProperties {
+    // Boolean properties
+    linkify: boolean;
+    typographer: boolean;
+    codeHighligtThemeFollowSystem: boolean;
+
+    // HTML related settings
+    unescapeAllHtmlEntites: boolean;
+    enableHtmlPurify: boolean;
+
+    // HTML escape settings
+    unescapeGtInText: boolean;
+    unescapeBeforeHighlight: boolean;
+
+    // Debug settings
+    consoleOutput: boolean; // If false, mditLogger will not output to console.
+}
+
+export interface SettingStateAction {
+
+
+    // Function properties
+    forceUnescapeBeforeHighlight(): boolean | undefined;
+    forceEnableHtmlPurify(): boolean | undefined;
+
+    // Function to update a setting
+    updateSetting(key: keyof SettingStateProperties, value: boolean): void;
+}
+
+
 
 /**
  * forcefieldName() method is used to return the value indicating the setting  
@@ -24,7 +42,7 @@ import { LiteLoaderStorage } from '@/utils/liteloaderConfig';
  * For example, when `unescapeAllHtmlEntites = true`, `forceEnableHtmlPurify()` 
  * should return `true` to make sure all HTML content be sanitized before rendering.
  */
-export const useSettingsStore = create(
+export const useSettingsStore = create<SettingStateProperties & SettingStateAction>()(
     persist(
         immer(subscribeWithSelector((set, get) => ({
             linkify: true,
@@ -38,6 +56,9 @@ export const useSettingsStore = create(
             // HTML escape settings
             unescapeGtInText: true,
             unescapeBeforeHighlight: true,
+
+            // Debug settings
+            consoleOutput: true,
 
             forceUnescapeBeforeHighlight: () => {
                 if (get().unescapeAllHtmlEntites === true) {
