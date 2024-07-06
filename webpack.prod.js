@@ -1,7 +1,13 @@
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 
-module.exports = merge(common, {
-    watch: false,
-    mode: 'production',
+
+
+const configs = common.map(function (config) {
+    return merge(config, {
+        watch: false,
+        mode: 'production',
+    });
 });
+
+module.exports = configs;
