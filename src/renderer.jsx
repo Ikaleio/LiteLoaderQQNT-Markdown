@@ -191,7 +191,7 @@ function render() {
                 const href = event
                     .composedPath()[0]
                     .href.replace("app://./renderer/", "");
-                await markdown_it.open_link(href);
+                await LiteLoader.api.openExternal(href);
                 return false;
             };
         })
