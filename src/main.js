@@ -26,7 +26,9 @@ import { generateMainProcessLogerWriter } from '@/utils/logger_main';
 
 const loggerWriter = generateMainProcessLogerWriter();
 
-onLoad();
+function onBrowserWindowCreated() {
+    onLoad();
+}
 
 // 加载插件时触发
 function onLoad() {
@@ -56,5 +58,5 @@ function onLoad() {
 
 // 这两个函数都是可选的
 export {
-    onLoad,
+    onBrowserWindowCreated,
 };

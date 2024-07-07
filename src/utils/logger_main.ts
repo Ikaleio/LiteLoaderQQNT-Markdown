@@ -5,6 +5,8 @@ import { LiteLoaderInterFace } from '@/utils/liteloader_type';
 
 declare const LiteLoader: LiteLoaderInterFace<Object>;
 
+var _logWriter: any = undefined;
+
 export function generateMainProcessLogerWriter() {
     var startTimeStr: string = new Date().toISOString();
     startTimeStr = startTimeStr.replaceAll(':', '-');
@@ -38,9 +40,5 @@ export function generateMainProcessLogerWriter() {
 
         var logStr = `${consoleMode.toUpperCase()} | ${timeStr} | ${argsStr}`;
         stream.write(`${logStr}\n`);
-        try {
-        } catch (e) {
-            console.log(`[markdown-it] Log file failed to update`, e);
-        }
     }
 }
