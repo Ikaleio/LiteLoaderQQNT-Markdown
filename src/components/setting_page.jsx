@@ -13,11 +13,14 @@ export function SettingPage() {
         <setting-section data-title='关于'>
             <setting-panel>
                 <setting-list data-direction='column'>
-                    <setting-item data-direction='row'>
-                        <setting-text>设置更新</setting-text>
-                        <setting-text data-type='secondary'>在此页面更新设置后，需要重启QQ后方可生效</setting-text>
-                    </setting-item>
+                    <ButtonTile title='Github 仓库' caption='本项目的 Github 源代码仓库地址。' actionName='查看源代码' href='https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown' />
+                    <ButtonTile title='提交反馈' caption='提交您对于本插件的建议，或者反馈使用中遇到的问题。' actionName='提交反馈' href='https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/issues/new' />
+                </setting-list>
+            </setting-panel>
 
+            <setting-panel>
+                <setting-list data-direction='column'>
+                    <DescriptionTile title='设置更新' caption='在此页面更新设置后，需要重启QQ后方可生效' />
                 </setting-list>
             </setting-panel>
         </setting-section>
@@ -101,8 +104,8 @@ export function SettingPage() {
 
                     <ButtonTile
                         title='MarkdownIt 日志目录'
-                        caption='日志存放于插件 [插件根目录]/log 文件夹中'
-                        actionName='打开插件根目录'
+                        caption='日志存放于插件 [插件根目录]/log 文件夹中。'
+                        actionName='插件目录'
                         path={LiteLoader.plugins.markdown_it.path.plugin} />
 
                 </setting-list>
@@ -175,7 +178,6 @@ function TextAndCaptionBlock({ title, caption }) {
             'display': 'flex',
             'flexWrap': 'wrap',
             'flexDirection': 'column',
-            // 'width': '92%',
             'flex': '1 1 auto',
         }}>
             <setting-text>{title}</setting-text>

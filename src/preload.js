@@ -14,4 +14,5 @@ contextBridge.exposeInMainWorld("markdown_it", {
     // remove_settings: (key) =>
     //     ipcRenderer.invoke("LiteLoader.markdown_it.remove_settings", key),
     log: (consoleType, ...args) => ipcRenderer.invoke('LiteLoader.markdown_it.log', consoleType, ...args),
+    get_log_path: () => ipcRenderer.invoke('LiteLoader.markdown_it.get_log_path'),
 });

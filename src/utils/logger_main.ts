@@ -5,13 +5,32 @@ import { LiteLoaderInterFace } from '@/utils/liteloader_type';
 
 declare const LiteLoader: LiteLoaderInterFace<Object>;
 
-var _logWriter: any = undefined;
+export const LogPathHelper = {
+    getLogFolderPath() {
+        return path.join(LiteLoader.plugins.markdown_it.path.plugin, 'log');
+    },
 
+    /**
+     * Get absolute file path of a log file.
+     * 
+     * @param logFileName Name of the log file. If `undefined`, 
+     * will generate automatically based on current time.
+     */
+    getLogFilePath(logFileName?: string | undefined) {
+        // generate log file name if not received
+        logFileName ??= (new Date().toISOString()).replaceAll(':', '-');
+
+        return path.join(LiteLoader.plugins.markdown_it.path.plugin, 'log', `${logFileName}.log`);
+    }
+};
+
+/**
+ * Generate a writer function that used to write log into log file.
+ */
 export function generateMainProcessLogerWriter() {
-    var startTimeStr: string = new Date().toISOString();
-    startTimeStr = startTimeStr.replaceAll(':', '-');
-    var logFolderPath = path.join(LiteLoader.plugins.markdown_it.path.plugin, 'log');
-    var logFilePath = path.join(LiteLoader.plugins.markdown_it.path.plugin, 'log', `${startTimeStr}.log`);
+    var logFolderPath = LogPathHelper.getLogFolderPath();
+    var logFilePath = LogPathHelper.getLogFilePath();
+
     console.log(`[markdown-it] logFolderPath: ${logFolderPath}`);
     console.log(`[markdown-it] logFilePath: ${logFilePath}`);
 
