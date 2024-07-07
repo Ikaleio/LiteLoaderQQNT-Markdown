@@ -1,5 +1,5 @@
 // 运行在 Electron 主进程 下的插件入口
-const { shell, ipcMain } = require("electron");
+const { ipcMain } = require("electron");
 import { generateMainProcessLogerWriter } from '@/utils/logger_main';
 
 // const setttingsJsonFilePath = `${plugin_path}/settings.json`;
@@ -27,7 +27,9 @@ import { generateMainProcessLogerWriter } from '@/utils/logger_main';
 const loggerWriter = generateMainProcessLogerWriter();
 
 function onBrowserWindowCreated() {
-    onLoad();
+    try { onLoad(); } catch (e) {
+        console.error('[markdown-it]', e);
+    }
 }
 
 // 加载插件时触发

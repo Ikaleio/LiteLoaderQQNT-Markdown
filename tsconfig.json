@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "target": "ES2021",
         "baseUrl": "./",
         "paths": {
             "@/*": [
@@ -11,6 +10,9 @@
         "noImplicitAny": true,
         "jsx": "react",
         "allowJs": true,
+        "target": "ES2021",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext"
     },
     "exclude": [
         "./dist/**/*" // This is what fixed it!

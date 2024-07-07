@@ -84,6 +84,16 @@ export function SettingPage() {
                         caption='关闭后，将屏蔽 MarkdownIt 插件向控制台输出的信息，目前仅能屏蔽部分信息。' />
 
                     <SwitchSettingTile
+                        settingName='fileOutput'
+                        title='日志文件输出'
+                        caption='关闭后，MarkdownIt 将不会将调试信息保存在日志文件中。' />
+
+                    <SwitchSettingTile
+                        settingName='enableElementCapture'
+                        title='启用元素调试'
+                    />
+
+                    <SwitchSettingTile
                         settingName='unescapeGtInText'
                         title='反转义消息字符中的">"符号'
                         caption='开启后，可正常显示 Blockquote 格式。' />
