@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useSettingsStore } from '@/states/settings';
+import { mditLogger } from '@/utils/logger';
 
 
 export function SettingPage() {
@@ -9,7 +10,6 @@ export function SettingPage() {
 
     // use encapsulated <DescriptionTile> and <SwitchSettingTile> whenever possible.
     return (<>
-
         <setting-section data-title='关于'>
             <setting-panel>
                 <setting-list data-direction='column'>
@@ -77,6 +77,11 @@ export function SettingPage() {
                 <setting-list data-direction='column'>
 
                     <DescriptionTile title='SettingsState' caption={JSON.stringify(settings, undefined, ' ')} />
+                </setting-list>
+            </setting-panel>
+
+            <setting-panel>
+                <setting-list data-direction='column'>
 
                     <SwitchSettingTile
                         settingName='consoleOutput'
@@ -91,7 +96,20 @@ export function SettingPage() {
                     <SwitchSettingTile
                         settingName='enableElementCapture'
                         title='启用元素调试'
+                        caption='开启后，日志文件中将会保存指定调试消息的HTML。'
                     />
+
+                    <ButtonTile
+                        title='MarkdownIt 日志目录'
+                        caption='日志存放于插件 [插件根目录]/log 文件夹中'
+                        actionName='打开插件根目录'
+                        path={LiteLoader.plugins.markdown_it.path.plugin} />
+
+                </setting-list>
+            </setting-panel>
+
+            <setting-panel>
+                <setting-list data-direction='column'>
 
                     <SwitchSettingTile
                         settingName='unescapeGtInText'
@@ -131,11 +149,13 @@ function SwitchSettingTile({ settingName, title, caption }) {
     return (
         <setting-item>
             <TextAndCaptionBlock title={title} caption={caption} />
-
             <setting-switch data-direction='row'
                 onClick={() => { updateSetting(settingName, !settings[settingName]) }}
                 is-active={settingsValue == true ? true : undefined}
                 is-disabled={getForceValue()}
+                style={{
+                    'flex': 'none',
+                }}
             ></setting-switch>
         </setting-item>
     );
@@ -155,7 +175,8 @@ function TextAndCaptionBlock({ title, caption }) {
             'display': 'flex',
             'flexWrap': 'wrap',
             'flexDirection': 'column',
-            'width': '92%',
+            // 'width': '92%',
+            'flex': '1 1 auto',
         }}>
             <setting-text>{title}</setting-text>
             <setting-text
@@ -169,5 +190,34 @@ function TextAndCaptionBlock({ title, caption }) {
                 'overflowY': 'scroll',
             }}>{caption}</p></setting-text>
         </div>
+    );
+}
+
+function ButtonTile({ title, caption, href, path, callback, actionName }) {
+    callback ??= function () {
+        if (href !== undefined && href !== null) {
+            LiteLoader.api.openExternal(href);
+            return;
+        }
+        if (path !== undefined && path !== null) {
+            LiteLoader.api.openPath(path);
+            return;
+        }
+        mditLogger('debug', 'Button with no action clicked');
+
+    }
+
+    return (
+        <setting-item data-direction='row'>
+            <TextAndCaptionBlock title={title} caption={caption} />
+            <setting-button
+                data-type='secondary'
+                onClick={callback}
+                style={{
+                    'flex': 'none',
+                }}>
+                {actionName}
+            </setting-button>
+        </setting-item>
     );
 }
