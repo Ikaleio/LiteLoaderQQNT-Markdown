@@ -89,23 +89,30 @@ export function elementDebugLogger() {
 
     // Add flag class for all marked --mdit-debug-capture-element
     Array.from(codeEle)
-        .filter((ele) => !ele.classList.contains(loggedClassName)) // ensure one message box will only be logged one time
         .filter((ele) => ele.innerHTML == logFlagClassName)
-        .forEach((ele) => { ele.classList.add(logFlagClassName) });
+        .forEach((ele) => {
+            ele.classList.add(logFlagClassName);
+        });
 
     // find all self sent message box that has been marked to capture, then log it.
     var flaggedMsgBoxs = document.querySelectorAll(`div.message-content__wrapper div.container--self:has(.${logFlagClassName})`);
 
-    Array.from(flaggedMsgBoxs).forEach((ele) => {
-        // file-only logger
-        mditLoggerGenerator({
-            ...defaultMditLoggerOptions,
-            consoleOutput: false,
-        })('log', ele.outerHTML);
-        ele.classList.add(loggedClassName);
+    var loggedCount = 0;
+    Array
+        .from(flaggedMsgBoxs)
+        .filter((ele) => !ele.classList.contains(loggedClassName)) // ensure one message box will only be logged one time
+        .forEach((ele) => {
+            // file-only logger
+            mditLoggerGenerator({
+                ...defaultMditLoggerOptions,
+                consoleOutput: false,
+            })('log', ele.outerHTML);
 
-        mditLogger('debug', `Element captured: ${ele.tagName}`);
-    });
+            mditLogger('debug', `Element captured: ${ele.tagName}`);
 
-    mditLogger('info', 'Element Capture Finished:', `${flaggedMsgBoxs.length} element(s) has been logged`);
+            ele.classList.add(loggedClassName);
+            loggedCount++;
+        });
+
+    mditLogger('info', 'Element Capture Finished:', `${loggedCount} element(s) has been logged`);
 }
