@@ -27,7 +27,7 @@
     ],
     "injects": {
         "renderer": "./dist/renderer.js",
-        "main": "./src/main.js",
+        "main": "./dist/main.js",
         "preload": "./src/preload.js"
     }
 }

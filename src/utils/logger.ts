@@ -4,6 +4,10 @@
 
 import { useSettingsStore } from '@/states/settings';
 
+declare const markdown_it: {
+    log: (consoleType: string, ...args: any[]) => any
+};
+
 type DistributiveFilter<Origin, Filter> = Origin extends Filter ? Origin : never;
 
 /**
@@ -32,6 +36,8 @@ function showOuputToConsole() {
  * ```
  */
 export function mditLogger(consoleFunction: SupportedLoggerFuncKey, ...params: any[]) {
+    markdown_it.log(consoleFunction, ...params);
+
     if (!showOuputToConsole()) {
         return undefined;
     }
@@ -40,4 +46,3 @@ export function mditLogger(consoleFunction: SupportedLoggerFuncKey, ...params: a
         'background-color: rgba(0, 149, 204, 0.8); border-radius: 6px;padding-block: 2px; padding-inline: 0px; color: white;',
         ...params);
 }
-

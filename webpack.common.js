@@ -62,16 +62,16 @@ const mainProcessConfig = {
         // Explicitly resolve files with following extension as modules.
         extensions: ['', '.js', '.jsx', '.ts', '.tsx'],
     },
-    experiments: {
-        outputModule: true,
-    },
+    // experiments: {
+    //     outputModule: true,
+    // },
     target: 'electron-main',
     entry: "./src/main.js",
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: 'main.js',
         library: {
-            type: 'commonjs', // necessary in order to work with liteloader.
+            type: 'commonjs-static', // necessary in order to work with liteloader.
         },
         chunkFormat: 'module', // or 'module'
     },
