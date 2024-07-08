@@ -25,7 +25,7 @@ import { useSettingsStore } from '@/states/settings';
 
 // Utils
 import { debounce } from 'throttle-debounce';
-import { mditLogger } from './utils/logger';
+import { mditLogger, elementDebugLogger } from './utils/logger';
 
 
 const markdownRenderedClassName = 'markdown-rendered';
@@ -203,10 +203,11 @@ function render() {
             })
         messageBox.removeChild(posBase);
 
-        changeDirectionToColumnWhenLargerHeight();
+    });
 
-    })
-
+    // code that runs after renderer work finished.
+    changeDirectionToColumnWhenLargerHeight();
+    elementDebugLogger();
 }
 
 function loadCSSFromURL(url, id) {

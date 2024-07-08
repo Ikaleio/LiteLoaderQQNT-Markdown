@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useSettingsStore } from '@/states/settings';
+import { mditLogger } from '@/utils/logger';
 
 
 export function SettingPage() {
@@ -9,15 +10,17 @@ export function SettingPage() {
 
     // use encapsulated <DescriptionTile> and <SwitchSettingTile> whenever possible.
     return (<>
-
         <setting-section data-title='关于'>
             <setting-panel>
                 <setting-list data-direction='column'>
-                    <setting-item data-direction='row'>
-                        <setting-text>设置更新</setting-text>
-                        <setting-text data-type='secondary'>在此页面更新设置后，需要重启QQ后方可生效</setting-text>
-                    </setting-item>
+                    <ButtonTile title='Github 仓库' caption='本项目的 Github 源代码仓库地址。' actionName='查看源代码' href='https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown' />
+                    <ButtonTile title='提交反馈' caption='提交您对于本插件的建议，或者反馈使用中遇到的问题。' actionName='提交反馈' href='https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/issues/new' />
+                </setting-list>
+            </setting-panel>
 
+            <setting-panel>
+                <setting-list data-direction='column'>
+                    <DescriptionTile title='设置更新' caption='在此页面更新设置后，需要重启QQ后方可生效' />
                 </setting-list>
             </setting-panel>
         </setting-section>
@@ -77,11 +80,39 @@ export function SettingPage() {
                 <setting-list data-direction='column'>
 
                     <DescriptionTile title='SettingsState' caption={JSON.stringify(settings, undefined, ' ')} />
+                </setting-list>
+            </setting-panel>
+
+            <setting-panel>
+                <setting-list data-direction='column'>
 
                     <SwitchSettingTile
                         settingName='consoleOutput'
                         title='控制台输出'
                         caption='关闭后，将屏蔽 MarkdownIt 插件向控制台输出的信息，目前仅能屏蔽部分信息。' />
+
+                    <SwitchSettingTile
+                        settingName='fileOutput'
+                        title='日志文件输出'
+                        caption='关闭后，MarkdownIt 将不会将调试信息保存在日志文件中。' />
+
+                    <SwitchSettingTile
+                        settingName='enableElementCapture'
+                        title='启用元素调试'
+                        caption='开启后，日志文件中将会保存指定调试消息的HTML。'
+                    />
+
+                    <ButtonTile
+                        title='MarkdownIt 日志目录'
+                        caption='日志存放于插件 [插件根目录]/log 文件夹中。'
+                        actionName='插件目录'
+                        path={LiteLoader.plugins.markdown_it.path.plugin} />
+
+                </setting-list>
+            </setting-panel>
+
+            <setting-panel>
+                <setting-list data-direction='column'>
 
                     <SwitchSettingTile
                         settingName='unescapeGtInText'
@@ -121,11 +152,13 @@ function SwitchSettingTile({ settingName, title, caption }) {
     return (
         <setting-item>
             <TextAndCaptionBlock title={title} caption={caption} />
-
             <setting-switch data-direction='row'
                 onClick={() => { updateSetting(settingName, !settings[settingName]) }}
                 is-active={settingsValue == true ? true : undefined}
                 is-disabled={getForceValue()}
+                style={{
+                    'flex': 'none',
+                }}
             ></setting-switch>
         </setting-item>
     );
@@ -145,7 +178,7 @@ function TextAndCaptionBlock({ title, caption }) {
             'display': 'flex',
             'flexWrap': 'wrap',
             'flexDirection': 'column',
-            'width': '92%',
+            'flex': '1 1 auto',
         }}>
             <setting-text>{title}</setting-text>
             <setting-text
@@ -159,5 +192,34 @@ function TextAndCaptionBlock({ title, caption }) {
                 'overflowY': 'scroll',
             }}>{caption}</p></setting-text>
         </div>
+    );
+}
+
+function ButtonTile({ title, caption, href, path, callback, actionName }) {
+    callback ??= function () {
+        if (href !== undefined && href !== null) {
+            LiteLoader.api.openExternal(href);
+            return;
+        }
+        if (path !== undefined && path !== null) {
+            LiteLoader.api.openPath(path);
+            return;
+        }
+        mditLogger('debug', 'Button with no action clicked');
+
+    }
+
+    return (
+        <setting-item data-direction='row'>
+            <TextAndCaptionBlock title={title} caption={caption} />
+            <setting-button
+                data-type='secondary'
+                onClick={callback}
+                style={{
+                    'flex': 'none',
+                }}>
+                {actionName}
+            </setting-button>
+        </setting-item>
     );
 }

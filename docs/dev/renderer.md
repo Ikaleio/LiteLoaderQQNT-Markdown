@@ -5,8 +5,9 @@
 
 - [Introduction](#introduction)
   - [Start Developing](#start-developing)
+  - [Logging](#logging)
   - [Create Release Version](#create-release-version)
-- [UI Development](#ui-development)
+  - [UI Development](#ui-development)
 - [Content Rendering Test Example](#content-rendering-test-example)
 
 
@@ -30,6 +31,21 @@ npm run dev
 
 This will start `webpack` in watch mode with `development` flag enabled.
 
+## Logging
+
+A custom `conole` wrapper `mditLogger` is recommend when you need to log something in *Renderer Process*. You can import the logger by:
+
+```javascript
+import { mditLogger } from './utils/logger';
+
+function someFunc() {
+  mditLogger('debug', 'debug info here.'); // Output: [MarkdownIt] debug info here.
+}
+```
+
+
+
+Use `mditLogger` whenever possible.
 
 ## Create Release Version
 
@@ -45,7 +61,7 @@ The script `npm run release` will:
 2. Run `git archive` to create a `release.zip` file contains all code included in `git`.
 3. Run `zip -r` to add `dist` directory into previously generated `release.zip`.
 
-# UI Development
+## UI Development
 
 You could use `React` to develop plugin settings UI interface. The entrance of user settings page is `src/components/setting_page.js`
 
