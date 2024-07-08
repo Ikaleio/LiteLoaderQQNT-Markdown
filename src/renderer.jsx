@@ -27,11 +27,10 @@ import { useSettingsStore } from '@/states/settings';
 import { debounce } from 'throttle-debounce';
 import { mditLogger, elementDebugLogger } from './utils/logger';
 
-
 const markdownRenderedClassName = 'markdown-rendered';
-const plugin_path = LiteLoader.plugins["markdown_it"].path.plugin;
+let markdownItIns = undefined;
 
-var markdownItIns = undefined;
+onLoad();
 
 function generateMarkdownIns() {
     const settings = useSettingsStore.getState();
@@ -105,7 +104,7 @@ function render() {
         return x;
     }
 
-    var newlyFoundMsgList = Array.from(elements)
+    let newlyFoundMsgList = Array.from(elements)
         // 跳过已渲染的消息
         .filter((messageBox) => (!messageBox.classList.contains(markdownRenderedClassName)))
         // 跳过空消息
@@ -183,18 +182,7 @@ function render() {
         addOnClickHandleForLatexBlock(markdownBody);
 
         // 在外部浏览器打开连接
-        markdownBody.querySelectorAll("a").forEach((e) => {
-            e.classList.add("markdown_it_link");
-            e.classList.add("text-link");
-            e.onclick = async (event) => {
-                event.preventDefault();
-                const href = event
-                    .composedPath()[0]
-                    .href.replace("app://./renderer/", "");
-                await LiteLoader.api.openExternal(href);
-                return false;
-            };
-        })
+        handleExternalLink(markdownBody);
 
         // 放回内容
         Array.from(markdownBody.childNodes)
@@ -202,7 +190,6 @@ function render() {
                 posBase.before(elem)
             })
         messageBox.removeChild(posBase);
-
     });
 
     // code that runs after renderer work finished.
@@ -210,18 +197,26 @@ function render() {
     elementDebugLogger();
 }
 
-function loadCSSFromURL(url, id) {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = url;
-    link.id = id;
-    document.head.appendChild(link);
+/**
+ * Markdown body process function used in render() to add openExternal() 
+ * behaviour to all links inside rendered markdownBody.
+ */
+function handleExternalLink(markdownBody) {
+    markdownBody.querySelectorAll("a").forEach((e) => {
+        e.classList.add("markdown_it_link");
+        e.classList.add("text-link");
+        e.onclick = async (event) => {
+            event.preventDefault();
+            const href = event
+                .composedPath()[0]
+                .href.replace("app://./renderer/", "");
+            await LiteLoader.api.openExternal(href);
+            return false;
+        };
+    });
 }
 
-onLoad();
-
 function _onLoad() {
-    const settings = useSettingsStore.getState();
     const plugin_path = LiteLoader.plugins.markdown_it.path.plugin;
 
     loadCSSFromURL(`local:///${plugin_path}/src/style/markdown.css`);
@@ -229,7 +224,8 @@ function _onLoad() {
     loadCSSFromURL(`local:///${plugin_path}/src/style/hljs-github-dark.css`, 'github-hl-dark');
     loadCSSFromURL(`local:///${plugin_path}/src/style/hljs-github.css`, 'github-hl-adaptive');
 
-    var _ = useSettingsStore.subscribe(
+    // Change fenced code block theme based on settings.
+    let _ = useSettingsStore.subscribe(
         state => (state.codeHighligtThemeFollowSystem),
         (isFollowSystem) => {
             if (isFollowSystem) {
@@ -240,6 +236,8 @@ function _onLoad() {
             }
         });
 
+
+    // Observe change of message list. Once changed, trigger render() function.
     const observer = new MutationObserver((mutationsList) => {
         for (let mutation of mutationsList) {
             if (mutation.type === "childList") {
@@ -252,18 +250,26 @@ function _onLoad() {
             }
         }
     });
+    observer.observe(document.body, { childList: true, subtree: true });
+}
 
-    const targetNode = document.body;
-    const config = { childList: true, subtree: true };
-    observer.observe(targetNode, config);
+/**
+ * Util function used in onLoad() to load local CSS.
+ */
+function loadCSSFromURL(url, id) {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = url;
+    link.id = id;
+    document.head.appendChild(link);
 }
 
 function onLoad() {
     try {
-        console.log('[MarkdownIt] OnLoad() triggered');
+        mditLogger('debug', '[MarkdownIt] OnLoad() triggered');
         return _onLoad();
     } catch (e) {
-        console.log(e);
+        mditLogger('error', e);
     }
 }
 
