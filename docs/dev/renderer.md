@@ -8,6 +8,7 @@
   - [Logging](#logging)
   - [Create Release Version](#create-release-version)
   - [UI Development](#ui-development)
+- [Read More](#read-more)
 - [Content Rendering Test Example](#content-rendering-test-example)
 
 
@@ -77,6 +78,12 @@ export function YourComponentHere(){
 Currently only `.js` file extension is supported, using `.jsx` may cause webpack package resolve error.
 
 > This might be solved by provide custom package resolve rules to webpack but I didn't look into it.
+
+# Read More
+
+[Message Rendering Process](./msg_rendering_process.md)
+
+[HTML Entities Processing](./msg_rendering_process.md)
 
 # Content Rendering Test Example
 

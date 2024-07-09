@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { existsSync, mkdirSync, createWriteStream } from 'fs';
+import { existsSync, mkdirSync, rmSync, createWriteStream } from 'fs';
 import { writeFile } from 'fs/promises';
 import { LiteLoaderInterFace } from '@/utils/liteloader_type';
 
@@ -34,6 +34,9 @@ export function generateMainProcessLogerWriter() {
     console.log(`[markdown-it] logFolderPath: ${logFolderPath}`);
     console.log(`[markdown-it] logFilePath: ${logFilePath}`);
 
+    // clear former log file
+    rmSync(logFolderPath, { recursive: true });
+
     // create dir if not exists
     try {
         if (!existsSync(logFolderPath)) {
@@ -52,9 +55,9 @@ export function generateMainProcessLogerWriter() {
 
         var argsStr = args.reduce(function (str, value) {
             if (typeof value === 'string') {
-                return str + value;
+                return str + value + ' ';
             }
-            return str + JSON.stringify(value);
+            return str + JSON.stringify(value) + ' ';
         }, '');
 
         var logStr = `${consoleMode.toUpperCase()} | ${timeStr} | ${argsStr}`;
