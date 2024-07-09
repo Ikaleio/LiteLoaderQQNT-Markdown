@@ -2,7 +2,7 @@ import { useSettingsStore } from '@/states/settings';
 import { escapeHtml, purifyHtml, unescapeHtml } from '@/utils/htmlProc';
 import { mditLogger } from '@/utils/logger';
 
-type ReplaceFunc = (parentElement: HTMLElement) => any;
+type ReplaceFunc = (parentElement: HTMLElement, id: string) => any;
 
 const TEXT_ELEMENT_MATCHER = 'text-element';
 const IMG_ELEMENT_MATCHER = 'pic-element';
@@ -13,6 +13,7 @@ const IMG_ELEMENT_MATCHER = 'pic-element';
 export interface MsgProcessInfo {
     mark: string;
     replace?: ReplaceFunc;
+    id?: string;
 }
 
 /**
@@ -51,11 +52,12 @@ function textElementProcessor(element: Element): MsgProcessInfo | undefined {
 /**
  * This fucked up everything.
  */
-const picElementProcessor = replaceFuncGenerator((e) => e.classList.contains(IMG_ELEMENT_MATCHER), (id) => (`\n<span id="${id}"></span>\n`));
+const picElementProcessor = replaceFuncGenerator({ filter: (e) => e.classList.contains(IMG_ELEMENT_MATCHER), placeholder: (id) => (` <span id="${id}"></span> `) });
 
-const spanReplaceProcessor = replaceFuncGenerator((e) => (e.tagName == 'SPAN'));
+const spanReplaceProcessor = replaceFuncGenerator({ filter: (e) => (e.tagName == 'SPAN') });
 
-function replaceFuncGenerator(
+
+interface replaceFuncGeneratorProps {
     /**
      * The generated processort with only deal with elements which this filter returns `true`.
      */
@@ -67,9 +69,16 @@ function replaceFuncGenerator(
     /**
      * Custom replace function. Use defaul one if `undefined`.
      */
-    replace?: (parent: HTMLElement) => any,
-): FragmentProcessFunc {
+    replace?: (parent: HTMLElement, id: string) => any,
+}
 
+function replaceFuncGenerator(
+    props: replaceFuncGeneratorProps,
+): FragmentProcessFunc {
+    let {
+        filter,
+        placeholder,
+    } = props;
     placeholder ??= (id) => (`<span id="${id}"></span>`);
 
     return function (element: HTMLElement, index: number) {
@@ -77,13 +86,19 @@ function replaceFuncGenerator(
             return undefined;
         }
 
-        const id = "placeholder-" + index;
+        let id = `placeholder-${index}`;
+        let replace = props.replace;
 
-        replace ??= (parent: HTMLElement) => {
+        replace ??= (parent: HTMLElement, id: string) => {
             try {
                 // here oldNode may be `undefined` or  `null`.
                 // Plugin will broke without this try catch block.
+                mditLogger('debug', 'Try replace oldNode with element:', element);
+                mditLogger('debug', 'Search placeholder with id', id);
+
                 const oldNode = parent.querySelector(`#${id}`);
+                mditLogger('debug', 'Old node found', oldNode);
+
                 oldNode.replaceWith(element);
                 mditLogger('debug', 'Replace success:', element);
             } catch (e) {
@@ -93,6 +108,7 @@ function replaceFuncGenerator(
 
         return {
             mark: placeholder(id),
+            id: id,
             replace: replace,
         }
     }
@@ -102,7 +118,7 @@ function replaceFuncGenerator(
  * Triggered from begin to end, preemptive.
  */
 export const processorList: FragmentProcessFunc[] = [
+    picElementProcessor,
     textElementProcessor,
-    // picElementProcessor,
     spanReplaceProcessor,
 ];

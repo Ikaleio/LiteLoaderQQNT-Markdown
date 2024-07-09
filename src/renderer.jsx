@@ -1,5 +1,5 @@
 // 运行在 Electron 渲染进程 下的页面脚本
-var { createRoot } = require("react-dom/client");
+const { createRoot } = require("react-dom/client");
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 
@@ -40,7 +40,7 @@ function generateMarkdownIns() {
         return markdownItIns;
     }
     mditLogger('info', 'Generating new markdown-it renderer...');
-    var localMarkdownItIns = markdownIt({
+    let localMarkdownItIns = markdownIt({
         html: true, // 在源码中启用 HTML 标签
         xhtmlOut: true, // 使用 '/' 来闭合单标签 （比如 <br />）。
         // 这个选项只对完全的 CommonMark 模式兼容。
@@ -72,9 +72,9 @@ function generateMarkdownIns() {
 
 
 const debouncedRender = debounce(
-    20,
+    50,
     render,
-    { atBegin: true },
+    { atBegin: false },
 );
 
 // 将所有 span 合并
@@ -89,24 +89,6 @@ function render() {
         ".message-content"
     );
 
-    function entityProcesor(x) {
-        if (settings.unescapeAllHtmlEntites == true) {
-            return unescapeHtml(x);
-        }
-        if (settings.unescapeGtInText == true) {
-            return x.replaceAll('&gt;', '>');
-        }
-        return x;
-    }
-
-    function renderedHtmlProcessor(x) {
-        if ((settings.forceEnableHtmlPurify() ?? settings.enableHtmlPurify) == true) {
-            mditLogger('debug', `Purified ${x}`);
-            return purifyHtml(x);
-        }
-        return x;
-    }
-
     let newlyFoundMsgList = Array.from(elements)
         // 跳过已渲染的消息
         .filter((messageBox) => (!messageBox.classList.contains(markdownRenderedClassName)))
@@ -115,82 +97,13 @@ function render() {
 
     mditLogger('debug', 'Newly found message count:', newlyFoundMsgList.length);
 
-    newlyFoundMsgList.forEach(async (messageBox) => {
-        // 标记已渲染 markdown，防止重复执行导致性能损失
-        messageBox.classList.add(markdownRenderedClassName);
-        // Get all children of message box. Return if length is zero.
-        const spanElem = Array.from(messageBox.children);
-        mditLogger('debug', 'SpanElem:', spanElem);
-        if (spanElem.length == 0) return;
-
-        // 坐标位置，以备后续将 html 元素插入文档中
-        const posBase = document.createElement('span')
-        spanElem[0].before(posBase)
-
-        // Here using entityProcess which may finally call DOMParser().parseFromString(input, "text/html");
-        // This may introduce XSS attack vulnurability, however we will use DOMPurify to prevent all 
-        // dangerous HTML elements when rendering rendered markdown.
-        const markPieces = spanElem.map((msgPiece, index) => {
-            let retInfo = undefined;
-
-            // try apply pieces processor in order. Stop once a processor could process current msgPiece
-            processorList.some(function (procFunc) {
-                let funcRet = procFunc(msgPiece, index);
-                retInfo = funcRet;
-                mditLogger('debug', 'Piece processor return:', funcRet);
-                return retInfo !== undefined;
-            });
-
-            // if undefined, this element should be ignored and not be removed in later process.
-            if (retInfo === undefined) {
-                msgPiece.classList.add(markdownIgnoredPieceClassName);
-            }
-
-            return retInfo;
-        });
-
-        // 渲染 markdown
-        const marks = markPieces.filter(p => p !== undefined).map((p) => p.mark).reduce((acc, p) => acc + p, "");
-        mditLogger('debug', 'Marks:', marks);
-        let renderedHtml = renderedHtmlProcessor(await generateMarkdownIns().render(marks));
-        mditLogger('debug', 'Rendered:', renderedHtml)
-
-        // 移除旧元素
-        spanElem.filter((e) => messageBox.hasChildNodes(e))
-            .forEach((e) => {
-                // do not remove formerly ignored elements.s
-                if (e.classList.contains(markdownIgnoredPieceClassName)) {
-                    mditLogger('debug', 'Remove Ignore Triggered:', e);
-                    return;
-                }
-                messageBox.removeChild(e);
-            })
-
-        // 将原有元素替换回内容
-        const markdownBody = document.createElement('div');
-        // some themes rely on this class to render 
-        markdownBody.innerHTML = `<div class="text-normal">${renderedHtml}</div>`;
-        markPieces.filter((p) => (p?.replace !== undefined))
-            .forEach((p) => {
-                p.replace(markdownBody)
-            })
-
-        // Handle click of Copy Code Button
-        addOnClickHandleForCopyButton(markdownBody);
-
-        // Handle click of Copy Latex Button
-        addOnClickHandleForLatexBlock(markdownBody);
-
-        // 在外部浏览器打开连接
-        handleExternalLink(markdownBody);
-
-        // 放回内容
-        Array.from(markdownBody.childNodes)
-            .forEach((elem) => {
-                posBase.before(elem)
-            })
-        messageBox.removeChild(posBase);
-    });
+    for (let msgBox of newlyFoundMsgList) {
+        try {
+            renderSingleMsgBox(msgBox);
+        } catch (e) {
+            mditLogger('debug', 'Render msgbox failed', e);
+        }
+    }
 
     // code that runs after renderer work finished.
     changeDirectionToColumnWhenLargerHeight();
@@ -214,6 +127,103 @@ function handleExternalLink(markdownBody) {
             return false;
         };
     });
+}
+
+async function renderSingleMsgBox(messageBox) {
+    const settings = useSettingsStore.getState();
+
+    function renderedHtmlProcessor(x) {
+        if ((settings.forceEnableHtmlPurify() ?? settings.enableHtmlPurify) == true) {
+            mditLogger('debug', `Purified ${x}`);
+            return purifyHtml(x);
+        }
+        return x;
+    }
+
+    if (messageBox.classList.contains(markdownRenderedClassName)) {
+        return;
+    }
+    // 标记已渲染 markdown，防止重复执行导致性能损失
+    messageBox.classList.add(markdownRenderedClassName);
+    // Get all children of message box. Return if length is zero.
+    const spanElem = Array.from(messageBox.children);
+    mditLogger('debug', 'SpanElem:', spanElem);
+    if (spanElem.length == 0) return;
+
+    // 坐标位置，以备后续将 html 元素插入文档中
+    const posBase = document.createElement('span')
+    spanElem[0].before(posBase)
+
+    // Here using entityProcess which may finally call DOMParser().parseFromString(input, "text/html");
+    // This may introduce XSS attack vulnurability, however we will use DOMPurify to prevent all 
+    // dangerous HTML elements when rendering rendered markdown.
+    const markPieces = spanElem.map((msgPiece, index) => {
+        mditLogger('debug', 'PieceProcessor', 'index:', index);
+        mditLogger('debug', 'PieceProcessor', 'Original Piece:', msgPiece);
+        let retInfo = undefined;
+
+        // try apply pieces processor in order. Stop once a processor could process current msgPiece
+        processorList.some(function (procFunc) {
+            let funcRet = procFunc(msgPiece, index);
+            retInfo = funcRet;
+
+            return retInfo !== undefined;
+        });
+
+        // if undefined, this element should be ignored and not be removed in later process.
+        if (retInfo === undefined) {
+            msgPiece.classList.add(markdownIgnoredPieceClassName);
+        }
+        mditLogger('debug', 'PieceProcessor', 'Piece processor return:', retInfo);
+        return retInfo;
+    });
+
+    // 渲染 markdown
+    const marks = markPieces.filter(p => p !== undefined).map((p) => p.mark).reduce((acc, p) => acc + p, "");
+    mditLogger('debug', 'MarkdownRender Input:', marks);
+    let renderedHtml = renderedHtmlProcessor(await generateMarkdownIns().render(marks));
+    mditLogger('debug', 'MarkdownRender Output:', renderedHtml)
+
+    // 移除旧元素
+    spanElem
+        .filter((e) => messageBox.hasChildNodes(e))
+        .forEach((e) => {
+            // do not remove formerly ignored elements.s
+            if (e.classList.contains(markdownIgnoredPieceClassName)) {
+                mditLogger('debug', 'Remove Ignore Triggered:', e);
+                return;
+            }
+            messageBox.removeChild(e);
+        });
+
+    // 将原有元素替换回内容
+    const markdownBody = document.createElement('div');
+    // some themes rely on this class to render 
+    markdownBody.innerHTML = `<div class="text-normal">${renderedHtml}</div>`;
+    markPieces.filter((p) => (p?.replace !== undefined))
+        .forEach((p) => {
+            p.replace(markdownBody, p.id);
+        });
+
+
+
+
+
+    // Handle click of Copy Code Button
+    addOnClickHandleForCopyButton(markdownBody);
+
+    // Handle click of Copy Latex Button
+    addOnClickHandleForLatexBlock(markdownBody);
+
+    // 在外部浏览器打开连接
+    handleExternalLink(markdownBody);
+
+    // 放回内容
+    Array.from(markdownBody.childNodes)
+        .forEach((elem) => {
+            posBase.before(elem)
+        })
+    messageBox.removeChild(posBase);
 }
 
 function _onLoad() {
@@ -275,7 +285,7 @@ function onLoad() {
 
 // 打开设置界面时触发
 function onSettingWindowCreated(view) {
-    var root = React.createRoot(view);
+    let root = React.createRoot(view);
     root.render(<SettingPage></SettingPage>);
 }
 
