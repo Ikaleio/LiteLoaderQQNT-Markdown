@@ -1,7 +1,7 @@
 ![React](https://img.shields.io/badge/React-blue?style=for-the-badge&logo=react&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-yellow?style=for-the-badge&logo=javascript&logoColor=white)
 ![Typescript](https://img.shields.io/badge/TypeScript-blue?style=for-the-badge&logo=typescript&logoColor=white)
-![Webpack](https://img.shields.io/badge/Webpack-grey?style=for-the-badge&logo=react&logoColor=white)
+![Webpack](https://img.shields.io/badge/Webpack-grey?style=for-the-badge&logo=webpack&logoColor=white)
 
 - [Introduction](#introduction)
   - [Start Developing](#start-developing)
