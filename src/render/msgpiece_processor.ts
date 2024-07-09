@@ -1,0 +1,108 @@
+import { useSettingsStore } from '@/states/settings';
+import { escapeHtml, purifyHtml, unescapeHtml } from '@/utils/htmlProc';
+import { mditLogger } from '@/utils/logger';
+
+type ReplaceFunc = (parentElement: HTMLElement) => any;
+
+const TEXT_ELEMENT_MATCHER = 'text-element';
+const IMG_ELEMENT_MATCHER = 'pic-element';
+
+/**
+ * Data type used by renderer to determine how to render and replace an element.
+ */
+export interface MsgProcessInfo {
+    mark: string;
+    replace?: ReplaceFunc;
+}
+
+/**
+ * Function type that used to process children elements inside QQNT message box.
+ */
+type FragmentProcessFunc = (element: HTMLElement, index: number) => MsgProcessInfo | undefined;
+
+function textElementProcessor(element: Element): MsgProcessInfo | undefined {
+    // return undefine if type not match
+    if (!(element.tagName == 'SPAN') || !element.classList.contains(TEXT_ELEMENT_MATCHER) || element.querySelector('.text-element--at')) {
+        return undefined;
+    }
+
+    mditLogger('debug', 'ElementMatch', 'Source', element);
+    mditLogger('debug', 'Element', 'Match', 'spanTextProcessor');
+
+    // text processor
+    let settings = useSettingsStore.getState();
+    function entityProcesor(x: string) {
+        if (settings.unescapeAllHtmlEntites == true) {
+            return unescapeHtml(x);
+        }
+        if (settings.unescapeGtInText == true) {
+            return x.replaceAll('&gt;', '>');
+        }
+        return x;
+    }
+
+    return {
+        mark: Array.from(element.getElementsByTagName("span"))
+            .map((element) => element.innerHTML)
+            .reduce((acc, x) => acc + entityProcesor(x), ''),
+    };
+}
+
+/**
+ * This fucked up everything.
+ */
+const picElementProcessor = replaceFuncGenerator((e) => e.classList.contains(IMG_ELEMENT_MATCHER), (id) => (`\n<span id="${id}"></span>\n`));
+
+const spanReplaceProcessor = replaceFuncGenerator((e) => (e.tagName == 'SPAN'));
+
+function replaceFuncGenerator(
+    /**
+     * The generated processort with only deal with elements which this filter returns `true`.
+     */
+    filter: (element: HTMLElement) => boolean,
+    /**
+     * Custom function to generate placeholder text based on id.
+     */
+    placeholder?: (id: string) => string,
+    /**
+     * Custom replace function. Use defaul one if `undefined`.
+     */
+    replace?: (parent: HTMLElement) => any,
+): FragmentProcessFunc {
+
+    placeholder ??= (id) => (`<span id="${id}"></span>`);
+
+    return function (element: HTMLElement, index: number) {
+        if (!filter(element)) {
+            return undefined;
+        }
+
+        const id = "placeholder-" + index;
+
+        replace ??= (parent: HTMLElement) => {
+            try {
+                // here oldNode may be `undefined` or  `null`.
+                // Plugin will broke without this try catch block.
+                const oldNode = parent.querySelector(`#${id}`);
+                oldNode.replaceWith(element);
+                mditLogger('debug', 'Replace success:', element);
+            } catch (e) {
+                mditLogger('error', 'Replace failed on element:', element, e);
+            }
+        };
+
+        return {
+            mark: placeholder(id),
+            replace: replace,
+        }
+    }
+}
+
+/**
+ * Triggered from begin to end, preemptive.
+ */
+export const processorList: FragmentProcessFunc[] = [
+    textElementProcessor,
+    // picElementProcessor,
+    spanReplaceProcessor,
+];

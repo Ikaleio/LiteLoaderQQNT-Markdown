@@ -26,8 +26,10 @@ import { useSettingsStore } from '@/states/settings';
 // Utils
 import { debounce } from 'throttle-debounce';
 import { mditLogger, elementDebugLogger } from './utils/logger';
+import { processorList } from '@/render/msgpiece_processor';
 
 const markdownRenderedClassName = 'markdown-rendered';
+const markdownIgnoredPieceClassName = 'mdit-ignored';
 let markdownItIns = undefined;
 
 onLoad();
@@ -78,6 +80,7 @@ const debouncedRender = debounce(
 // 将所有 span 合并
 // 并使用 markdown-it 渲染
 function render() {
+    // return;
     mditLogger('debug', 'renderer() triggered');
 
     const settings = useSettingsStore.getState();
@@ -114,13 +117,11 @@ function render() {
 
     newlyFoundMsgList.forEach(async (messageBox) => {
         // 标记已渲染 markdown，防止重复执行导致性能损失
-        messageBox.classList.add(markdownRenderedClassName)
-
-        // 消息都在 span 里
-        const spanElem = Array.from(messageBox.childNodes)
-            .filter((e) => e.tagName == 'SPAN')
-
-        if (spanElem.length == 0) return
+        messageBox.classList.add(markdownRenderedClassName);
+        // Get all children of message box. Return if length is zero.
+        const spanElem = Array.from(messageBox.children);
+        mditLogger('debug', 'SpanElem:', spanElem);
+        if (spanElem.length == 0) return;
 
         // 坐标位置，以备后续将 html 元素插入文档中
         const posBase = document.createElement('span')
@@ -130,47 +131,46 @@ function render() {
         // This may introduce XSS attack vulnurability, however we will use DOMPurify to prevent all 
         // dangerous HTML elements when rendering rendered markdown.
         const markPieces = spanElem.map((msgPiece, index) => {
-            if (msgPiece.className.includes("text-element") && !msgPiece.querySelector('.text-element--at')) {
-                return {
-                    mark: Array.from(msgPiece.getElementsByTagName("span"))
-                        .map((e) => e.innerHTML)
-                        .reduce((acc, x) => acc + entityProcesor(x), ''),
-                    replace: null
-                }
-            } else {
-                const id = "placeholder-" + index
-                return {
-                    mark: `<span id="${id}"></span>`,
-                    replace: (parent) => {
-                        try {
-                            // here oldNode may be `undefined`
-                            // Plugin will broke without this try catch block.
-                            const oldNode = parent.querySelector(`#${id}`);
-                            oldNode.replaceWith(msgPiece);
-                        } catch (e) {
-                            ;
-                        }
-                    }
-                }
+            let retInfo = undefined;
+
+            // try apply pieces processor in order. Stop once a processor could process current msgPiece
+            processorList.some(function (procFunc) {
+                let funcRet = procFunc(msgPiece, index);
+                retInfo = funcRet;
+                mditLogger('debug', 'Piece processor return:', funcRet);
+                return retInfo !== undefined;
+            });
+
+            // if undefined, this element should be ignored and not be removed in later process.
+            if (retInfo === undefined) {
+                msgPiece.classList.add(markdownIgnoredPieceClassName);
             }
+
+            return retInfo;
         });
 
         // 渲染 markdown
-        const marks = markPieces.map((p) => p.mark).reduce((acc, p) => acc + p, "");
-        var renderedHtml = renderedHtmlProcessor(await generateMarkdownIns().render(marks))
+        const marks = markPieces.filter(p => p !== undefined).map((p) => p.mark).reduce((acc, p) => acc + p, "");
+        mditLogger('debug', 'Marks:', marks);
+        let renderedHtml = renderedHtmlProcessor(await generateMarkdownIns().render(marks));
+        mditLogger('debug', 'Rendered:', renderedHtml)
 
         // 移除旧元素
-        spanElem
-            .filter((e) => messageBox.hasChildNodes(e))
+        spanElem.filter((e) => messageBox.hasChildNodes(e))
             .forEach((e) => {
-                messageBox.removeChild(e)
+                // do not remove formerly ignored elements.s
+                if (e.classList.contains(markdownIgnoredPieceClassName)) {
+                    mditLogger('debug', 'Remove Ignore Triggered:', e);
+                    return;
+                }
+                messageBox.removeChild(e);
             })
 
         // 将原有元素替换回内容
         const markdownBody = document.createElement('div');
         // some themes rely on this class to render 
         markdownBody.innerHTML = `<div class="text-normal">${renderedHtml}</div>`;
-        markPieces.filter((p) => p.replace != null)
+        markPieces.filter((p) => (p?.replace !== undefined))
             .forEach((p) => {
                 p.replace(markdownBody)
             })
