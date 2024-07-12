@@ -53,8 +53,20 @@ export function mditLoggerGenerator(options: MditLoggerOptions = defaultMditLogg
                 ...params);
         }
 
-        if (outputToFileSettingEnabled() && options.fileOutput) {
-            markdown_it.log(consoleFunction, ...params);
+        try {
+            if (outputToFileSettingEnabled() && options.fileOutput) {
+
+                let serializedParams = params.map((param) => {
+                    if (typeof param !== 'string') {
+                        return JSON.stringify(param);
+                    }
+                    return param;
+                });
+
+                markdown_it.log(consoleFunction, ...serializedParams);
+            }
+        } catch (e) {
+            ;
         }
 
         return undefined;

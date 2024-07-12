@@ -1,5 +1,5 @@
 // 运行在 Electron 渲染进程 下的页面脚本
-var { createRoot } = require("react-dom/client");
+const { createRoot } = require("react-dom/client");
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 
@@ -26,12 +26,13 @@ import { useSettingsStore } from '@/states/settings';
 // Utils
 import { debounce } from 'throttle-debounce';
 import { mditLogger, elementDebugLogger } from './utils/logger';
-
+import { processorList } from '@/render/msgpiece_processor';
 
 const markdownRenderedClassName = 'markdown-rendered';
-const plugin_path = LiteLoader.plugins["markdown_it"].path.plugin;
+const markdownIgnoredPieceClassName = 'mdit-ignored';
+let markdownItIns = undefined;
 
-var markdownItIns = undefined;
+onLoad();
 
 function generateMarkdownIns() {
     const settings = useSettingsStore.getState();
@@ -39,7 +40,7 @@ function generateMarkdownIns() {
         return markdownItIns;
     }
     mditLogger('info', 'Generating new markdown-it renderer...');
-    var localMarkdownItIns = markdownIt({
+    let localMarkdownItIns = markdownIt({
         html: true, // 在源码中启用 HTML 标签
         xhtmlOut: true, // 使用 '/' 来闭合单标签 （比如 <br />）。
         // 这个选项只对完全的 CommonMark 模式兼容。
@@ -71,14 +72,15 @@ function generateMarkdownIns() {
 
 
 const debouncedRender = debounce(
-    20,
+    50,
     render,
-    { atBegin: true },
+    { atBegin: false },
 );
 
 // 将所有 span 合并
 // 并使用 markdown-it 渲染
 function render() {
+    // return;
     mditLogger('debug', 'renderer() triggered');
 
     const settings = useSettingsStore.getState();
@@ -87,15 +89,48 @@ function render() {
         ".message-content"
     );
 
-    function entityProcesor(x) {
-        if (settings.unescapeAllHtmlEntites == true) {
-            return unescapeHtml(x);
+    let newlyFoundMsgList = Array.from(elements)
+        // 跳过已渲染的消息
+        .filter((messageBox) => (!messageBox.classList.contains(markdownRenderedClassName)))
+        // 跳过空消息
+        .filter((messageBox) => messageBox.childNodes.length > 0);
+
+    mditLogger('debug', 'Newly found message count:', newlyFoundMsgList.length);
+
+    for (let msgBox of newlyFoundMsgList) {
+        try {
+            renderSingleMsgBox(msgBox);
+        } catch (e) {
+            mditLogger('debug', 'Render msgbox failed', e);
         }
-        if (settings.unescapeGtInText == true) {
-            return x.replaceAll('&gt;', '>');
-        }
-        return x;
     }
+
+    // code that runs after renderer work finished.
+    changeDirectionToColumnWhenLargerHeight();
+    elementDebugLogger();
+}
+
+/**
+ * Markdown body process function used in render() to add openExternal() 
+ * behaviour to all links inside rendered markdownBody.
+ */
+function handleExternalLink(markdownBody) {
+    markdownBody.querySelectorAll("a").forEach((e) => {
+        e.classList.add("markdown_it_link");
+        e.classList.add("text-link");
+        e.onclick = async (event) => {
+            event.preventDefault();
+            const href = event
+                .composedPath()[0]
+                .href.replace("app://./renderer/", "");
+            await LiteLoader.api.openExternal(href);
+            return false;
+        };
+    });
+}
+
+async function renderSingleMsgBox(messageBox) {
+    const settings = useSettingsStore.getState();
 
     function renderedHtmlProcessor(x) {
         if ((settings.forceEnableHtmlPurify() ?? settings.enableHtmlPurify) == true) {
@@ -105,123 +140,93 @@ function render() {
         return x;
     }
 
-    var newlyFoundMsgList = Array.from(elements)
-        // 跳过已渲染的消息
-        .filter((messageBox) => (!messageBox.classList.contains(markdownRenderedClassName)))
-        // 跳过空消息
-        .filter((messageBox) => messageBox.childNodes.length > 0);
+    if (messageBox.classList.contains(markdownRenderedClassName)) {
+        return;
+    }
+    // 标记已渲染 markdown，防止重复执行导致性能损失
+    messageBox.classList.add(markdownRenderedClassName);
+    // Get all children of message box. Return if length is zero.
+    const spanElem = Array.from(messageBox.children);
+    mditLogger('debug', 'SpanElem:', spanElem);
+    if (spanElem.length == 0) return;
 
-    mditLogger('debug', 'Newly found message count:', newlyFoundMsgList.length);
+    // 坐标位置，以备后续将 html 元素插入文档中
+    const posBase = document.createElement('span')
+    spanElem[0].before(posBase)
 
-    newlyFoundMsgList.forEach(async (messageBox) => {
-        // 标记已渲染 markdown，防止重复执行导致性能损失
-        messageBox.classList.add(markdownRenderedClassName)
+    // Here using entityProcess which may finally call DOMParser().parseFromString(input, "text/html");
+    // This may introduce XSS attack vulnurability, however we will use DOMPurify to prevent all 
+    // dangerous HTML elements when rendering rendered markdown.
+    const markPieces = spanElem.map((msgPiece, index) => {
+        mditLogger('debug', 'PieceProcessor', 'index:', index);
+        mditLogger('debug', 'PieceProcessor', 'Original Piece:', msgPiece);
+        let retInfo = undefined;
 
-        // 消息都在 span 里
-        const spanElem = Array.from(messageBox.childNodes)
-            .filter((e) => e.tagName == 'SPAN')
+        // try apply pieces processor in order. Stop once a processor could process current msgPiece
+        processorList.some(function (procFunc) {
+            let funcRet = procFunc(msgPiece, index);
+            retInfo = funcRet;
 
-        if (spanElem.length == 0) return
-
-        // 坐标位置，以备后续将 html 元素插入文档中
-        const posBase = document.createElement('span')
-        spanElem[0].before(posBase)
-
-        // Here using entityProcess which may finally call DOMParser().parseFromString(input, "text/html");
-        // This may introduce XSS attack vulnurability, however we will use DOMPurify to prevent all 
-        // dangerous HTML elements when rendering rendered markdown.
-        const markPieces = spanElem.map((msgPiece, index) => {
-            if (msgPiece.className.includes("text-element") && !msgPiece.querySelector('.text-element--at')) {
-                return {
-                    mark: Array.from(msgPiece.getElementsByTagName("span"))
-                        .map((e) => e.innerHTML)
-                        .reduce((acc, x) => acc + entityProcesor(x), ''),
-                    replace: null
-                }
-            } else {
-                const id = "placeholder-" + index
-                return {
-                    mark: `<span id="${id}"></span>`,
-                    replace: (parent) => {
-                        try {
-                            // here oldNode may be `undefined`
-                            // Plugin will broke without this try catch block.
-                            const oldNode = parent.querySelector(`#${id}`);
-                            oldNode.replaceWith(msgPiece);
-                        } catch (e) {
-                            ;
-                        }
-                    }
-                }
-            }
+            return retInfo !== undefined;
         });
 
-        // 渲染 markdown
-        const marks = markPieces.map((p) => p.mark).reduce((acc, p) => acc + p, "");
-        var renderedHtml = renderedHtmlProcessor(await generateMarkdownIns().render(marks))
-
-        // 移除旧元素
-        spanElem
-            .filter((e) => messageBox.hasChildNodes(e))
-            .forEach((e) => {
-                messageBox.removeChild(e)
-            })
-
-        // 将原有元素替换回内容
-        const markdownBody = document.createElement('div');
-        // some themes rely on this class to render 
-        markdownBody.innerHTML = `<div class="text-normal">${renderedHtml}</div>`;
-        markPieces.filter((p) => p.replace != null)
-            .forEach((p) => {
-                p.replace(markdownBody)
-            })
-
-        // Handle click of Copy Code Button
-        addOnClickHandleForCopyButton(markdownBody);
-
-        // Handle click of Copy Latex Button
-        addOnClickHandleForLatexBlock(markdownBody);
-
-        // 在外部浏览器打开连接
-        markdownBody.querySelectorAll("a").forEach((e) => {
-            e.classList.add("markdown_it_link");
-            e.classList.add("text-link");
-            e.onclick = async (event) => {
-                event.preventDefault();
-                const href = event
-                    .composedPath()[0]
-                    .href.replace("app://./renderer/", "");
-                await LiteLoader.api.openExternal(href);
-                return false;
-            };
-        })
-
-        // 放回内容
-        Array.from(markdownBody.childNodes)
-            .forEach((elem) => {
-                posBase.before(elem)
-            })
-        messageBox.removeChild(posBase);
-
+        // if undefined, this element should be ignored and not be removed in later process.
+        if (retInfo === undefined) {
+            msgPiece.classList.add(markdownIgnoredPieceClassName);
+        }
+        mditLogger('debug', 'PieceProcessor', 'Piece processor return:', retInfo);
+        return retInfo;
     });
 
-    // code that runs after renderer work finished.
-    changeDirectionToColumnWhenLargerHeight();
-    elementDebugLogger();
-}
+    // 渲染 markdown
+    const marks = markPieces.filter(p => p !== undefined).map((p) => p.mark).reduce((acc, p) => acc + p, "");
+    mditLogger('debug', 'MarkdownRender Input:', marks);
+    let renderedHtml = renderedHtmlProcessor(await generateMarkdownIns().render(marks));
+    mditLogger('debug', 'MarkdownRender Output:', renderedHtml)
 
-function loadCSSFromURL(url, id) {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = url;
-    link.id = id;
-    document.head.appendChild(link);
-}
+    // 移除旧元素
+    spanElem
+        .filter((e) => messageBox.hasChildNodes(e))
+        .forEach((e) => {
+            // do not remove formerly ignored elements.s
+            if (e.classList.contains(markdownIgnoredPieceClassName)) {
+                mditLogger('debug', 'Remove Ignore Triggered:', e);
+                return;
+            }
+            messageBox.removeChild(e);
+        });
 
-onLoad();
+    // 将原有元素替换回内容
+    const markdownBody = document.createElement('div');
+    // some themes rely on this class to render 
+    markdownBody.innerHTML = `<div class="text-normal">${renderedHtml}</div>`;
+    markPieces.filter((p) => (p?.replace !== undefined))
+        .forEach((p) => {
+            p.replace(markdownBody, p.id);
+        });
+
+
+
+
+
+    // Handle click of Copy Code Button
+    addOnClickHandleForCopyButton(markdownBody);
+
+    // Handle click of Copy Latex Button
+    addOnClickHandleForLatexBlock(markdownBody);
+
+    // 在外部浏览器打开连接
+    handleExternalLink(markdownBody);
+
+    // 放回内容
+    Array.from(markdownBody.childNodes)
+        .forEach((elem) => {
+            posBase.before(elem)
+        })
+    messageBox.removeChild(posBase);
+}
 
 function _onLoad() {
-    const settings = useSettingsStore.getState();
     const plugin_path = LiteLoader.plugins.markdown_it.path.plugin;
 
     loadCSSFromURL(`local:///${plugin_path}/src/style/markdown.css`);
@@ -229,7 +234,8 @@ function _onLoad() {
     loadCSSFromURL(`local:///${plugin_path}/src/style/hljs-github-dark.css`, 'github-hl-dark');
     loadCSSFromURL(`local:///${plugin_path}/src/style/hljs-github.css`, 'github-hl-adaptive');
 
-    var _ = useSettingsStore.subscribe(
+    // Change fenced code block theme based on settings.
+    let _ = useSettingsStore.subscribe(
         state => (state.codeHighligtThemeFollowSystem),
         (isFollowSystem) => {
             if (isFollowSystem) {
@@ -240,6 +246,8 @@ function _onLoad() {
             }
         });
 
+
+    // Observe change of message list. Once changed, trigger render() function.
     const observer = new MutationObserver((mutationsList) => {
         for (let mutation of mutationsList) {
             if (mutation.type === "childList") {
@@ -252,24 +260,32 @@ function _onLoad() {
             }
         }
     });
+    observer.observe(document.body, { childList: true, subtree: true });
+}
 
-    const targetNode = document.body;
-    const config = { childList: true, subtree: true };
-    observer.observe(targetNode, config);
+/**
+ * Util function used in onLoad() to load local CSS.
+ */
+function loadCSSFromURL(url, id) {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = url;
+    link.id = id;
+    document.head.appendChild(link);
 }
 
 function onLoad() {
     try {
-        console.log('[MarkdownIt] OnLoad() triggered');
+        mditLogger('debug', '[MarkdownIt] OnLoad() triggered');
         return _onLoad();
     } catch (e) {
-        console.log(e);
+        mditLogger('error', e);
     }
 }
 
 // 打开设置界面时触发
 function onSettingWindowCreated(view) {
-    var root = React.createRoot(view);
+    let root = React.createRoot(view);
     root.render(<SettingPage></SettingPage>);
 }
 
