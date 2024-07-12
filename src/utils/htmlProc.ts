@@ -5,6 +5,18 @@ import { mditLogger } from "./logger";
 const DOMPurify = require('DOMPurify');
 // import {} from 'dompurify';
 
+DOMPurify.addHook('uponSanitizeElement', function (node: HTMLElement, data: any) {
+    // mditLogger('debug', 'PurifyHook', 'Data', data);
+    if (data.allowedTags[data.tagName] === true) {
+        // mditLogger('debug', 'PurifyHook', 'Hook skipped');
+        return;
+    }
+    let newNode = document.createElement('p');
+    newNode.innerText = node.outerHTML;
+    // mditLogger('debug', 'PurifyHook', 'New node', newNode);
+    node.replaceWith(newNode);
+});
+
 interface UponSanitizeDataRecv {
     tagName: string;
     allowedTags: Record<string, boolean>;
