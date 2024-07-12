@@ -2,8 +2,7 @@
 
 import { mditLogger } from "./logger";
 
-const DOMPurify = require('DOMPurify');
-// import {} from 'dompurify';
+const DOMPurify = require('dompurify');
 
 DOMPurify.addHook('uponSanitizeElement', function (node: HTMLElement, data: any) {
     // mditLogger('debug', 'PurifyHook', 'Data', data);
