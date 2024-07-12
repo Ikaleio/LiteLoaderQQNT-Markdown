@@ -134,7 +134,7 @@ async function renderSingleMsgBox(messageBox) {
 
     function renderedHtmlProcessor(x) {
         if ((settings.forceEnableHtmlPurify() ?? settings.enableHtmlPurify) == true) {
-            mditLogger('debug', `Purified ${x}`);
+            mditLogger('debug', `Purify`, 'Input:', `${x}`);
             return purifyHtml(x);
         }
         return x;

@@ -106,7 +106,9 @@ Normal test with HTML Entities & " ' < > .
 
 ## 注意事项
 
-- 如果在使用插件时遇到问题，您可以通过 [发起 Issue](https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/issues/new) 向我们进行反馈。届时请尽可能附上诸如系统版本，插件列表， LiteLoaderQQNT 设置页版本信息截图等可以帮助分析问题的信息。如果你还安装了远程调试插件，可以再附上 Devtools 信息。
+您可以查看本项目的 [Known Issue](/docs/known_issue.md) 查看已经发现以及仍未解决的问题。
+
+如果在使用插件时遇到问题，您可以通过 [发起 Issue](https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/issues/new) 向我们进行反馈。届时请尽可能附上诸如系统版本，插件列表， LiteLoaderQQNT 设置页版本信息截图等可以帮助分析问题的信息。如果你还安装了远程调试插件，可以再附上 Devtools 信息。
 
 ## Contributing
 
