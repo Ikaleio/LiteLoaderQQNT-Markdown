@@ -7,7 +7,7 @@ declare const LiteLoader: LiteLoaderInterFace<Object>;
 
 export const LogPathHelper = {
     getLogFolderPath() {
-        return path.join(LiteLoader.plugins.markdown_it.path.plugin, 'log');
+        return path.join(LiteLoader.plugins.markdown_it.path.data, 'log');
     },
 
     /**
@@ -20,7 +20,7 @@ export const LogPathHelper = {
         // generate log file name if not received
         logFileName ??= (new Date().toISOString()).replaceAll(':', '-');
 
-        return path.join(LiteLoader.plugins.markdown_it.path.plugin, 'log', `${logFileName}.log`);
+        return path.join(LogPathHelper.getLogFolderPath(), `${logFileName}.log`);
     }
 };
 
@@ -28,14 +28,18 @@ export const LogPathHelper = {
  * Generate a writer function that used to write log into log file.
  */
 export function generateMainProcessLogerWriter() {
-    var logFolderPath = LogPathHelper.getLogFolderPath();
-    var logFilePath = LogPathHelper.getLogFilePath();
+    let logFolderPath = LogPathHelper.getLogFolderPath();
+    let logFilePath = LogPathHelper.getLogFilePath();
 
     console.log(`[markdown-it] logFolderPath: ${logFolderPath}`);
     console.log(`[markdown-it] logFilePath: ${logFilePath}`);
 
     // clear former log file
-    rmSync(logFolderPath, { recursive: true });
+    try {
+        rmSync(logFolderPath, { recursive: true });
+    } catch (e) {
+        console.error('[markdown-it] Failed to remove previous log file');
+    }
 
     // create dir if not exists
     try {
@@ -43,7 +47,8 @@ export function generateMainProcessLogerWriter() {
             mkdirSync(logFolderPath, { recursive: true });
         }
     } catch (err) {
-        console.error(err);
+        console.error('[markdown-it] Failed to create log directory');
+        return undefined;
     }
 
     var stream = createWriteStream(logFilePath, {
