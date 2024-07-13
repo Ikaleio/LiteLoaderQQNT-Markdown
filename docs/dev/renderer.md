@@ -75,9 +75,12 @@ export function YourComponentHere(){
 }
 ```
 
-Currently only `.js` file extension is supported, using `.jsx` may cause webpack package resolve error.
+Currently support file extension for `webpack` contains:
 
-> This might be solved by provide custom package resolve rules to webpack but I didn't look into it.
+- `.js`
+- `.jsx`
+- `.ts`
+- `.tsx`
 
 # Read More
 

@@ -1,6 +1,7 @@
 - [Workflow](#workflow)
   - [MsgProcessInfo](#msgprocessinfo)
   - [FragmentProcessFunc](#fragmentprocessfunc)
+- [Rendered Flag](#rendered-flag)
 - [Refs](#refs)
 
 
@@ -50,9 +51,26 @@ After the process above, we will get a list of `MsgProcessInfo` object. What we 
 - First, accumulate all `mark` from the list, passed it to *Markdown Renderer*, then get a `renderedHtml`.
 - Iterating `replace` field of `MsgProcessInfo` list, if not `undefined`, execute the replace function.
 
+# Rendered Flag
+
+We use a special HTML `class` text to mark a message box as `rendered` in `renderSingleMsgBox()` function. When `render()` triggered, it first detect all message box inside UI, then filter the ones that already been rendered. This approach could not only improve the performance but also solve some async issue.
+
+![image](https://github.com/user-attachments/assets/dedce85a-b26e-419c-b740-a42984a06238)
+
+`renderSingleMsgBox()` function is an `async` function. And `render()` will not use `await` to call that function, means if we do nothing, two `renderSingleMsgBox()` could be called at the same time to process the same message box. To ensure only one `renderSingleMsgBox()` function called for each message box, we could put the Rendered detection at the begining of the function:
+
+```js
+// skip rendered message
+if (messageBox.classList.contains(markdownRenderedClassName)) {
+    return;
+}
+// mark current message as rendered
+messageBox.classList.add(markdownRenderedClassName);
+```
+
 # Refs
 
 For more info about the process, check out source code file:
 
 - [msgpiece_processor.ts](/src/render/msgpiece_processor.ts)
-- [renderer.jsx](/src/renderer.jsx)
+- [renderer.tsx](/src/renderer.tsx)
