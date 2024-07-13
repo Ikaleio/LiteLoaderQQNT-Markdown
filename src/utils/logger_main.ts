@@ -7,7 +7,7 @@ declare const LiteLoader: LiteLoaderInterFace<Object>;
 
 export const LogPathHelper = {
     getLogFolderPath() {
-        return path.join(LiteLoader.plugins.markdown_it.path.plugin, 'log');
+        return path.join(LiteLoader.plugins.markdown_it.path.data, 'log');
     },
 
     /**
@@ -20,7 +20,7 @@ export const LogPathHelper = {
         // generate log file name if not received
         logFileName ??= (new Date().toISOString()).replaceAll(':', '-');
 
-        return path.join(LiteLoader.plugins.markdown_it.path.plugin, 'log', `${logFileName}.log`);
+        return path.join(LogPathHelper.getLogFolderPath(), `${logFileName}.log`);
     }
 };
 
