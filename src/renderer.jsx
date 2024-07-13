@@ -205,10 +205,6 @@ async function renderSingleMsgBox(messageBox) {
             p.replace(markdownBody, p.id);
         });
 
-
-
-
-
     // Handle click of Copy Code Button
     addOnClickHandleForCopyButton(markdownBody);
 

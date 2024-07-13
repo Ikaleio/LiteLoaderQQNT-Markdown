@@ -54,7 +54,12 @@ function textElementProcessor(element: Element): MsgProcessInfo | undefined {
  */
 const picElementProcessor = replaceFuncGenerator({ filter: (e) => e.classList.contains(IMG_ELEMENT_MATCHER), placeholder: (id) => (` <span id="${id}"></span> `) });
 
-const spanReplaceProcessor = replaceFuncGenerator({ filter: (e) => (e.tagName == 'SPAN') });
+const spanReplaceProcessor = replaceFuncGenerator({
+    filter: (e) => (
+        e.tagName == 'SPAN' || // deal with span
+        (e.tagName == 'DIV' && (e.classList?.contains('reply-element') ?? false)) // deal with reply element
+    )
+});
 
 
 interface replaceFuncGeneratorProps {
