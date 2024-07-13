@@ -66,7 +66,7 @@ const mainProcessConfig = {
     //     outputModule: true,
     // },
     target: 'electron-main',
-    entry: "./src/main.js",
+    entry: "./src/main.ts",
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: 'main.js',

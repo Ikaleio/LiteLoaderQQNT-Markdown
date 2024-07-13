@@ -115,9 +115,12 @@ export function SettingPage() {
 
                     <ButtonTile
                         title='MarkdownIt 日志目录'
-                        caption='日志存放于插件 [插件根目录]/log 文件夹中。'
-                        actionName='插件目录'
-                        path={LiteLoader.plugins.markdown_it.path.plugin}/>
+                        caption='日志存放于插件 [插件数据根目录]/log 文件夹中。'
+                        actionName='日志目录'
+                        callback={async function () {
+                            let path = await markdown_it.get_log_path();
+                            LiteLoader.api.openExternal(path);
+                        }}/>
 
                 </setting-list>
             </setting-panel>
