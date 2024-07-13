@@ -20,6 +20,7 @@ import {
   addOnClickHandleForLatexBlock,
   changeDirectionToColumnWhenLargerHeight
 } from './components/code_block';
+import {ShowOriginalContentButton, addShowOriginButtonToMarkdownBody} from '@/components/show_origin';
 
 // States
 import {useSettingsStore} from '@/states/settings';
@@ -152,7 +153,7 @@ async function renderSingleMsgBox(messageBox: HTMLElement) {
   // mark the current message as rendered
   messageBox.classList.add(markdownRenderedClassName);
 
-  // save original innerHTML for message box.
+  // original innerHTML for message box.
   let msgBoxOriginalInnerHTML = messageBox.innerHTML;
 
   // Get all children of message box. Return if length is zero.
@@ -223,6 +224,9 @@ async function renderSingleMsgBox(messageBox: HTMLElement) {
 
   // Handle open external link
   handleExternalLink(markdownBody);
+
+  // Add ShowOriginalContent button for this message.
+  addShowOriginButtonToMarkdownBody(markdownBody, messageBox, msgBoxOriginalInnerHTML);
 
   // 放回内容
   Array.from(markdownBody.childNodes)
