@@ -98,11 +98,11 @@ const textElementProcessor: FragmentProcessFunc = (parent, element, index) => {
     let settings = useSettingsStore.getState();
 
     // generate rendered HTML processor based on user config.
-    function renderedHtmlPostProcessor(x: string) {
+    function renderedHtmlPostProcessor(x: string): string {
         // text processor
         if ((settings.forceEnableHtmlPurify() ?? settings.enableHtmlPurify) === true) {
             mditLogger('debug', `Purify`, 'Input:', `${x}`);
-            return purifyHtml(x);
+            return purifyHtml(x) as string;
         }
 
         return x;
@@ -138,11 +138,30 @@ const textElementProcessor: FragmentProcessFunc = (parent, element, index) => {
 
     // render
     let renderedTextElement = element;
-    renderedTextElement.innerHTML = (
+    let renderedMarkdownInnerHtml = (
         // first use markdownit to render the html text
         // then passed to post processor (post processor also accept text)
-        renderedHtmlPostProcessor(getMarkdownIns().render(originalText))
+        renderedHtmlPostProcessor(getMarkdownIns().render(originalText)).trim()
     );
+    mditLogger('debug', 'Rendered/post-processed HTML innterText:', renderedMarkdownInnerHtml);
+
+    // remove unnecessary wrapping <p> if there is only one element
+    let renderedHtmlElement = (new DOMParser).parseFromString(renderedMarkdownInnerHtml, 'text/html');
+    mditLogger('debug', 'renderedHtmlElement.children.length==1', renderedHtmlElement.children.length == 1);
+    mditLogger('debug', 'renderedMarkdownInnerHtml.startsWith(p)', renderedMarkdownInnerHtml.startsWith('<p>'));
+    mditLogger('debug', 'renderedMarkdownInnerHtml.endsWith(p)', renderedMarkdownInnerHtml.endsWith('</p>'));
+    if ((renderedHtmlElement.children.length == 1)
+        && renderedMarkdownInnerHtml.startsWith('<p>')
+        && renderedMarkdownInnerHtml.endsWith('</p>')) {
+        renderedMarkdownInnerHtml =
+            renderedMarkdownInnerHtml
+                .substring(3, renderedMarkdownInnerHtml.length - 4)
+                .trim();
+        mditLogger('debug', 'Striped innerHTML:', renderedMarkdownInnerHtml);
+    }
+
+    renderedTextElement.innerHTML = renderedMarkdownInnerHtml;
+
 
     return {
         original: element,

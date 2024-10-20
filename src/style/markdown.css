@@ -172,10 +172,10 @@ pre.hl-code-block > button.lang_copy:not(:hover) > p.copy {
 }
 
 /* 修复轻量工具箱等插件时间显示多出换行的问题 */
-.mix-message__inner {
+/* .mix-message__inner {
     display: flex;
     flex-direction: row;
-}
+} */
 
 .lite-tools-slot.embed-slot {
     flex: none;
@@ -186,6 +186,6 @@ button.mdit-show-origin-button {
     color: inherit;
     opacity: 0.5;
     padding-inline: 2px;
-    text-underline: auto;
+    /* text-underline: auto; */
     border-width: 0px;
 }
