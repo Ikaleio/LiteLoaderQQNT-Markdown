@@ -101,7 +101,7 @@ em {
     font-style: italic;
 }
 
-span > p > img {
+span>p>img {
     max-width: 100%;
     height: auto;
 }
@@ -116,8 +116,8 @@ div.katex-block-rendered {
 }
 
 /* language and copy button style */
-pre.hl-code-block > button.lang_copy,
-div.katex-block-rendered > button.copy_latex {
+pre.hl-code-block>button.lang_copy,
+div.katex-block-rendered>button.copy_latex {
     z-index: 10;
     position: absolute;
     right: 2px;
@@ -134,16 +134,16 @@ div.katex-block-rendered > button.copy_latex {
     transition-duration: 20ms;
 }
 
-pre.hl-code-block > button.lang_copy:active,
-div.katex-block-rendered > button.copy_latex:active {
+pre.hl-code-block>button.lang_copy:active,
+div.katex-block-rendered>button.copy_latex:active {
     transform: scale(0.85);
 }
 
 
 @media (prefers-color-scheme: light) {
 
-    pre.hl-code-block > button.lang_copy,
-    div.katex-block-rendered > button.copy_latex {
+    pre.hl-code-block>button.lang_copy,
+    div.katex-block-rendered>button.copy_latex {
         background-color: rgba(255, 255, 255, 0.5);
         color: black;
     }
@@ -151,23 +151,23 @@ div.katex-block-rendered > button.copy_latex:active {
 
 @media (prefers-color-scheme: dark) {
 
-    pre.hl-code-block > button.lang_copy,
-    div.katex-block-rendered > button.copy_latex {
+    pre.hl-code-block>button.lang_copy,
+    div.katex-block-rendered>button.copy_latex {
         background-color: rgba(0, 0, 0, 0.5);
         color: white;
     }
 }
 
-pre.hl-code-block:not(:hover) > button.lang_copy,
-div.katex-block-rendered:not(:hover) > button.copy_latex {
+pre.hl-code-block:not(:hover)>button.lang_copy,
+div.katex-block-rendered:not(:hover)>button.copy_latex {
     display: none;
 }
 
-pre.hl-code-block > button.lang_copy:hover > p.lang {
+pre.hl-code-block>button.lang_copy:hover>p.lang {
     display: none;
 }
 
-pre.hl-code-block > button.lang_copy:not(:hover) > p.copy {
+pre.hl-code-block>button.lang_copy:not(:hover)>p.copy {
     display: none;
 }
 
@@ -176,6 +176,11 @@ pre.hl-code-block > button.lang_copy:not(:hover) > p.copy {
     display: flex;
     flex-direction: row;
 } */
+
+
+.mix-message__inner>.text-element>p+p {
+    padding-top: 14px;
+}
 
 .lite-tools-slot.embed-slot {
     flex: none;

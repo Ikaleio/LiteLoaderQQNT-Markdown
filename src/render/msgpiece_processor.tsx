@@ -147,10 +147,10 @@ const textElementProcessor: FragmentProcessFunc = (parent, element, index) => {
 
     // remove unnecessary wrapping <p> if there is only one element
     let renderedHtmlElement = (new DOMParser).parseFromString(renderedMarkdownInnerHtml, 'text/html');
-    mditLogger('debug', 'renderedHtmlElement.children.length==1', renderedHtmlElement.children.length == 1);
+    mditLogger('debug', 'renderedHtmlElement.body.children.length==1', renderedHtmlElement.body.children.length == 1);
     mditLogger('debug', 'renderedMarkdownInnerHtml.startsWith(p)', renderedMarkdownInnerHtml.startsWith('<p>'));
     mditLogger('debug', 'renderedMarkdownInnerHtml.endsWith(p)', renderedMarkdownInnerHtml.endsWith('</p>'));
-    if ((renderedHtmlElement.children.length == 1)
+    if ((renderedHtmlElement.body.children.length == 1)
         && renderedMarkdownInnerHtml.startsWith('<p>')
         && renderedMarkdownInnerHtml.endsWith('</p>')) {
         renderedMarkdownInnerHtml =
