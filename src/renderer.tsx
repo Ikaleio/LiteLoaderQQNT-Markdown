@@ -1,16 +1,14 @@
 // 运行在 Electron 渲染进程 下的页面脚本
-const {createRoot} = require("react-dom/client");
+const { createRoot } = require("react-dom/client");
 import React from 'react';
-import {renderToString} from 'react-dom/server';
+
 
 (React as any).createRoot = createRoot;
-import {SettingPage} from "./components/setting_page";
+import { SettingPage } from "./components/setting_page";
 
 const hljs = require('highlight.js');
 import markdownIt from 'markdown-it';
-import katex from '@/lib/markdown-it-katex';
 
-import {escapeHtml, purifyHtml, unescapeHtml} from '@/utils/htmlProc';
 
 // Components
 import {
@@ -20,18 +18,18 @@ import {
   addOnClickHandleForLatexBlock,
   changeDirectionToColumnWhenLargerHeight
 } from './components/code_block';
-import {ShowOriginalContentButton, addShowOriginButtonToMarkdownBody} from '@/components/show_origin';
+import { ShowOriginalContentButton, addShowOriginButtonToMarkdownBody } from '@/components/show_origin';
 
 // States
-import {useSettingsStore} from '@/states/settings';
+import { useSettingsStore } from '@/states/settings';
 
 // Utils
-import {debounce} from 'throttle-debounce';
-import {mditLogger, elementDebugLogger} from './utils/logger';
-import {processorList} from '@/render/msgpiece_processor';
+import { debounce } from 'throttle-debounce';
+import { mditLogger, elementDebugLogger } from './utils/logger';
+import { MsgProcessInfo, processorList } from '@/render/msgpiece_processor';
 
 // Types
-import {LiteLoaderInterFace} from '@/utils/liteloader_type';
+import { LiteLoaderInterFace } from '@/utils/liteloader_type';
 
 declare const LiteLoader: LiteLoaderInterFace<Object>;
 const markdownRenderedClassName = 'markdown-rendered';
@@ -40,46 +38,10 @@ let markdownItIns: markdownIt | undefined = undefined;
 
 onLoad();
 
-/**
- * Function that generates a MarkdownIt instance based on user settings.
- */
-function generateMarkdownIns() {
-  const settings = useSettingsStore.getState();
-  if (markdownItIns !== undefined) {
-    return markdownItIns;
-  }
-  mditLogger('info', 'Generating new markdown-it renderer...');
-  let localMarkdownItIns = markdownIt({
-    html: true, // 在源码中启用 HTML 标签
-    xhtmlOut: true, // 使用 '/' 来闭合单标签 （比如 <br />）。
-    // 这个选项只对完全的 CommonMark 模式兼容。
-    breaks: true, // 转换段落里的 '\n' 到 <br>。
-    langPrefix: "language-", // 给围栏代码块的 CSS 语言前缀。对于额外的高亮代码非常有用。
-    linkify: settings.linkify, // 将类似 URL 的文本自动转换为链接。
-
-    // 启用一些语言中立的替换 + 引号美化
-    typographer: settings.typographer,
-
-    // 双 + 单引号替换对，当 typographer 启用时。
-    // 或者智能引号等，可以是 String 或 Array。
-    //
-    // 比方说，你可以支持 '«»„“' 给俄罗斯人使用， '„“‚‘'  给德国人使用。
-    // 还有 ['«\xA0', '\xA0»', '‹\xA0', '\xA0›'] 给法国人使用（包括 nbsp）。
-    quotes: "“”‘’",
-
-    // custom highlight UI renderer for markdown it.
-    highlight: function (str, lang) {
-      return (renderToString(<HighLightedCodeBlock content={str} lang={lang}
-                                                   markdownItIns={localMarkdownItIns}/>));
-    },
-  }).use(katex);
-  localMarkdownItIns.renderer.rules.code_inline = renderInlineCodeBlockString;
-  markdownItIns = localMarkdownItIns;
-  return localMarkdownItIns;
-}
 
 
-const debouncedRender = debounce(50, render, {atBegin: false},);
+
+const debouncedRender = debounce(50, render, { atBegin: false },);
 
 /**
  * Root markdown render function.
@@ -95,10 +57,10 @@ function render() {
   const elements = document.querySelectorAll(".message-content");
 
   let newlyFoundMsgList = Array.from(elements)
-  // 跳过已渲染的消息
-  .filter((messageBox) => (!messageBox.classList.contains(markdownRenderedClassName)))
-  // 跳过空消息
-  .filter((messageBox) => messageBox.childNodes.length > 0);
+    // 跳过已渲染的消息
+    .filter((messageBox) => (!messageBox.classList.contains(markdownRenderedClassName)))
+    // 跳过空消息
+    .filter((messageBox) => messageBox.childNodes.length > 0);
 
   mditLogger('debug', 'Newly found message count:', newlyFoundMsgList.length);
 
@@ -135,86 +97,100 @@ function handleExternalLink(markdownBody: HTMLElement) {
 async function renderSingleMsgBox(messageBox: HTMLElement) {
   const settings = useSettingsStore.getState();
 
-  // generate rendered HTML processor based on user config.
-  function renderedHtmlProcessor(x: string) {
-    if ((settings.forceEnableHtmlPurify() ?? settings.enableHtmlPurify) === true) {
-      mditLogger('debug', `Purify`, 'Input:', `${x}`);
-      return purifyHtml(x);
-    }
-    return x;
-  }
-
   // For more info about Rendered class mark,
   // checkout: docs/dev/msg_rendering_process.md
   // skip rendered message
   if (messageBox.classList.contains(markdownRenderedClassName)) {
     return;
   }
+
   // mark the current message as rendered
   messageBox.classList.add(markdownRenderedClassName);
 
   // original innerHTML for message box.
+  // This is captured and used by "Show Original" feature.
   let msgBoxOriginalInnerHTML = messageBox.innerHTML;
 
   // Get all children of message box. Return if length is zero.
-  const spanElem = Array.from(messageBox.children);
-  mditLogger('debug', 'renderSingleMsgBox', 'SpanElem:', spanElem);
-  if (spanElem.length == 0) return;
+  const originalSpanList = Array.from(messageBox.children);
+  mditLogger('debug', 'renderSingleMsgBox', 'originalSpanList:', originalSpanList);
+  if (originalSpanList.length == 0) return;
 
   // used as pivot when we're inserting rendered elements later.
-  const posBase = document.createElement('span')
-  spanElem[0].before(posBase);
+  // const posBase = document.createElement('span')
+  // originalSpanList[0].before(posBase);
 
   // Here using entityProcess which may finally call DOMParser().parseFromString(input, "text/html");
   // This may introduce XSS attack vulnerability, however, we will use DOMPurify to prevent all
   // dangerous HTML elements when rendering markdown.
-  const markPieces = spanElem.map((msgPiece, index) => {
-    mditLogger('debug', 'PieceProcessor', 'index:', index);
-    mditLogger('debug', 'PieceProcessor', 'Original Piece:', msgPiece);
-    let retInfo = undefined;
+
+
+  // use fragment processors to deal with the span in messages one by one
+  // finally, we will get a list of rendered span
+  const renderedSpanInfo = originalSpanList.map((msgSpan, index) => {
+    mditLogger('debug', 'PieceProcessor', 'Original Piece:', msgSpan);
 
     // Try to apply piece processor in order. Stop once a processor could process current msgPiece
-    processorList.some(function (procFunc) {
-      let funcRet = procFunc((msgPiece as HTMLElement), index);
-      retInfo = funcRet;
+    for (let processor of processorList) {
+      // try get the return value of the processor
+      let renderedSpan = processor(messageBox, (msgSpan as HTMLElement), index);
+      // if processor returned a non-undefined value, use the new element
+      if (renderedSpan !== undefined) {
+        return renderedSpan;
+      }
+    }
 
-      return retInfo !== undefined;
-    });
+    // here means no any frag processor could handle this msgSpan, just return itself, 
+    // in other word, keep it's original looks.
+    return { original: msgSpan, rendered: msgSpan };
 
     // if undefined, this element should be ignored and not be removed in later process.
-    if (retInfo === undefined) {
-      msgPiece.classList.add(markdownIgnoredPieceClassName);
-    }
-    mditLogger('debug', 'PieceProcessor', 'Piece processor return:', retInfo);
-    return retInfo;
+    // if (retInfo === undefined) {
+    //   msgPiece.classList.add(markdownIgnoredPieceClassName);
+    // }
+    // mditLogger('debug', 'PieceProcessor', 'Piece processor return:', retInfo);
+    // return retInfo;
   });
+
+  mditLogger('debug', 'RenderedList generated, start replacing messagebox children...');
+
+  // replace the children based on rendered info
+  for (let renderedInfo of renderedSpanInfo) {
+    mditLogger('debug', 'Try to replace:', renderedInfo);
+    let originalIsChildren = originalSpanList.some((e) => e === renderedInfo.original);
+    // mditLogger('debug', 'Original element in messageBox:', originalIsChildren);
+    messageBox.replaceChild(renderedInfo.rendered, renderedInfo.original);
+  }
+
 
   // 渲染 markdown
-  const marks = markPieces.filter(p => p !== undefined).map((p) => p.mark).reduce((acc, p) => acc + p, "");
-  mditLogger('debug', 'MarkdownRender Input:', marks);
-  let renderedHtml = renderedHtmlProcessor(await generateMarkdownIns().render(marks));
-  mditLogger('debug', 'MarkdownRender Output:', renderedHtml)
+  // const marks = markPieces.filter(p => p !== undefined).map((p) => p.mark).reduce((acc, p) => acc + p, "");
+  // mditLogger('debug', 'MarkdownRender Input:', marks);
+  // let renderedHtml = renderedHtmlProcessor(await generateMarkdownIns().render(marks));
+  // mditLogger('debug', 'MarkdownRender Output:', renderedHtml);
 
   // 移除旧元素
-  spanElem
-  .filter((e) => messageBox.hasChildNodes())
-  .forEach((e) => {
-    // do not remove formerly ignored elements
-    if (e.classList.contains(markdownIgnoredPieceClassName)) {
-      mditLogger('debug', 'Remove Ignore Triggered:', e);
-      return;
-    }
-    messageBox.removeChild(e);
-  });
+  // originalSpanList
+  //   .filter((e) => messageBox.hasChildNodes())
+  //   .forEach((e) => {
+  //     // do not remove formerly ignored elements
+  //     if (e.classList.contains(markdownIgnoredPieceClassName)) {
+  //       mditLogger('debug', 'Remove Ignore Triggered:', e);
+  //       return;
+  //     }
+  //     messageBox.removeChild(e);
+  //   });
 
-  // 将原有元素替换回内容
-  const markdownBody = document.createElement('div');
-  // some themes rely on this class to render
-  markdownBody.innerHTML = `<div class="text-normal">${renderedHtml}</div>`;
-  markPieces.filter((p) => (p?.replace !== undefined))
-  .forEach((p) => {
-    p.replace(markdownBody, p.id);
-  });
+  // // 将原有元素替换回内容
+  // const markdownBody = document.createElement('div');
+  // // some themes rely on this class to render
+  // markdownBody.innerHTML = `<div class="text-normal">${renderedHtml}</div>`;
+  // markPieces.filter((p) => (p?.replace !== undefined))
+  //   .forEach((p) => {
+  //     p.replace(markdownBody, p.id);
+  //   });
+
+  let markdownBody = messageBox;
 
   // Handle click of Copy Code Button
   addOnClickHandleForCopyButton(markdownBody);
@@ -227,13 +203,6 @@ async function renderSingleMsgBox(messageBox: HTMLElement) {
 
   // Add ShowOriginalContent button for this message.
   addShowOriginButtonToMarkdownBody(markdownBody, messageBox, msgBoxOriginalInnerHTML);
-
-  // 放回内容
-  Array.from(markdownBody.childNodes)
-  .forEach((elem) => {
-    posBase.before(elem)
-  })
-  messageBox.removeChild(posBase);
 }
 
 function _onLoad() {
@@ -268,7 +237,7 @@ function _onLoad() {
       }
     }
   });
-  observer.observe(document.body, {childList: true, subtree: true});
+  observer.observe(document.body, { childList: true, subtree: true });
 }
 
 /**

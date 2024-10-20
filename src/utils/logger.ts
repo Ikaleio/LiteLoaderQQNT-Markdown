@@ -17,6 +17,11 @@ type LoggerFuncKey = {
     [K in keyof Console]: Console[K] extends (args: any) => any ? K : never;
 }[keyof Console];
 
+/**
+ * String literal unions of the supported logger function type.
+ * 
+ * `DistributiveFilter` will filtered out all options that actually not a valid function of console.
+ */
 export type SupportedLoggerFuncKey = DistributiveFilter<LoggerFuncKey, 'debug' | 'log' | 'info' | 'warn' | 'error'>;
 
 function outputToConsoleSettingEnabled() {
@@ -43,9 +48,16 @@ const defaultMditLoggerOptions: MditLoggerOptions = {
     fileOutput: true,
 }
 
+/**
+ * Logger function generator. Could generate log functions based on some configurations to 
+ * fit different use cases.
+ * @param options `MditLoggerOptions`
+ */
 export function mditLoggerGenerator(options: MditLoggerOptions = defaultMditLoggerOptions):
     (consoleFunction: SupportedLoggerFuncKey, ...params: any[]) => (undefined) {
     return function (consoleFunction: SupportedLoggerFuncKey, ...params: any[]) {
+
+        // if user enabled console output in settings, and the console output config of this logger is on
         if (outputToConsoleSettingEnabled() && options.consoleOutput) {
             console[consoleFunction](
                 '%c [MarkdownIt] ',
