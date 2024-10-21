@@ -12,7 +12,7 @@ const rendererProcessConfig = {
         outputModule: true,
     },
     target: 'electron-renderer',
-    entry: "./src/renderer.jsx",
+    entry: "./src/renderer.tsx",
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: 'renderer.js',
@@ -66,7 +66,7 @@ const mainProcessConfig = {
     //     outputModule: true,
     // },
     target: 'electron-main',
-    entry: "./src/main.js",
+    entry: "./src/main.ts",
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: 'main.js',

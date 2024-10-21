@@ -100,8 +100,12 @@ export function changeDirectionToColumnWhenLargerHeight() {
     var msgBlocks = document.querySelectorAll('.mix-message__inner');
     Array.from(msgBlocks).forEach(function (block) {
         var height = block.offsetHeight;
-        if (height > 30) {
+        mditLogger('debug', 'Detected messagebox height:', height);
+        if (height > 35) {
             block.style.flexDirection = 'column';
+        }
+        else {
+            block.style.flexDirection = 'row';
         }
     });
 }

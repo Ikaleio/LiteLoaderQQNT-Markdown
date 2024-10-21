@@ -22,13 +22,13 @@ export interface SettingStateProperties {
     consoleOutput: boolean; // If false, mditLogger will not output to console.
     fileOutput: boolean; // If false, mditLogger will not add log into log file.
     enableElementCapture: boolean;
+    showOriginalButton: boolean;
 }
 
 export interface SettingStateAction {
-
-
     // Function properties
     forceUnescapeBeforeHighlight(): boolean | undefined;
+
     forceEnableHtmlPurify(): boolean | undefined;
 
     // Function to update a setting
@@ -36,12 +36,11 @@ export interface SettingStateAction {
 }
 
 
-
 /**
- * forcefieldName() method is used to return the value indicating the setting  
+ * forcefieldName() method is used to return the value indicating the setting
  * `fieldName` is forced to that value despite the value stored in state.
  * Return `undefined` means repect values stored in states.
- * For example, when `unescapeAllHtmlEntites = true`, `forceEnableHtmlPurify()` 
+ * For example, when `unescapeAllHtmlEntites = true`, `forceEnableHtmlPurify()`
  * should return `true` to make sure all HTML content be sanitized before rendering.
  */
 export const useSettingsStore = create<SettingStateProperties & SettingStateAction>()(
@@ -63,6 +62,8 @@ export const useSettingsStore = create<SettingStateProperties & SettingStateActi
             consoleOutput: true,
             fileOutput: true,
             enableElementCapture: false,
+            showOriginalButton: false,
+
 
             forceUnescapeBeforeHighlight: () => {
                 if (get().unescapeAllHtmlEntites === true) {
@@ -85,7 +86,7 @@ export const useSettingsStore = create<SettingStateProperties & SettingStateActi
             }
         }))),
         {
-            name: 'state/settings',
+            name: 'settings',
             storage: LiteLoaderStorage,
         }
     ),

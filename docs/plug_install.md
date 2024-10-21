@@ -1,10 +1,26 @@
 # 安装本插件
 
-这里列出三种安装本插件的方法。
+在开始之前，请确保您已经按照 [LiteLoaderQQNT官方安装教程](https://liteloaderqqnt.github.io/guide/install.html) 成功安装并正常运行 LiteLoaderQQNT.
 
+在成功安装 LiteLoaderQQNT 之后，您可以继续根据下方的教程安装本插件。
+
+- 通过 插件列表查看插件 安装。 （推荐）
 - 通过 [PluginInstaller](https://github.com/xinyihl/LiteLoaderQQNT-PluginInstaller/tree/main) 安装。（推荐）
 - 通过下载 Release 中提供的ZIP压缩文件进行安装。
 - 通过`git clone`直接克隆本项目。
+
+# 通过 插件列表查看插件 安装
+
+> 正常情况下，推荐使用这种方式进行安装。
+
+插件列表查看插件 本身就是一个 LiteLoaderQQNT 插件。首先根据插件官方文档的指引，安装 [插件列表查看](https://github.com/ltxhhz/LL-plugin-list-viewer/tree/main) 插件。
+
+然后重启QQ，进入设置 > 插件列表查看，找到 `Markdown-it` 插件，点击安装。显示安装成功后，再次重启QQ即可。
+
+![Plugin View Plug](https://github.com/user-attachments/assets/60b36c62-1899-4a88-b4c1-5cd4bb296968)
+
+> 上图为 插件列表中查看 中显示的本插件截图。
+
 
 # 通过 PluginInstaller 安装
 
