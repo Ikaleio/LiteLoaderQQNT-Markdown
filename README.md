@@ -110,9 +110,14 @@ Normal test with HTML Entities & " ' < > .
 
 如果在使用插件时遇到问题，您可以通过 [发起 Issue](https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/issues/new) 向我们进行反馈。届时请尽可能附上诸如系统版本，插件列表， LiteLoaderQQNT 设置页版本信息截图等可以帮助分析问题的信息。如果你还安装了远程调试插件，可以再附上 Devtools 信息。
 
+## Contributors
+
+[![](https://contrib.rocks/image?repo=Ikaleio/LiteLoaderQQNT-Markdown)](https://github.com/Ikaleio/LiteLoaderQQNT-Markdown/graphs/contributors)
+
 ## Star History
 
-![Star History Chart](https://api.star-history.com/svg?repos=Ikaleio/LiteLoaderQQNT-Markdown&type=Date)
+![Stargazers over time](https://starchart.cc/Ikaleio/LiteLoaderQQNT-Markdown.svg?variant=adaptive)
+
 
 如果您觉得本项目对您有帮助，可以帮忙点一下Star，谢谢！
 
