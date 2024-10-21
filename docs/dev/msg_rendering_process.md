@@ -1,55 +1,56 @@
 - [Workflow](#workflow)
-  - [MsgProcessInfo](#msgprocessinfo)
-  - [FragmentProcessFunc](#fragmentprocessfunc)
+  - [Fragments](#fragments)
+  - [Fragment Processor](#fragment-processor)
+  - [Children Replacement](#children-replacement)
 - [Rendered Flag](#rendered-flag)
+- [Global \& MessageRendered Callback](#global--messagerendered-callback)
 - [Refs](#refs)
 
 
 # Workflow
 
-Currently the plugin does NOT rendering all content inside a message box. We only deal with contents that may need go through the markdown renderer. Also, since some element should NOT be considered as Markdown when rendering and should keep what it look like throughout the rendering, we introduced the *Replacer*.
+Currently the plugin does NOT rendering all content inside a message box. We only deal with contents that may need go through the markdown renderer. Also, since some element should NOT be considered as Markdown when rendering and should keep what it look like throughout the rendering, we introduced the concept of **Fragement Processor**(FragProcessor).
 
-![image](https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/assets/61616918/c5f986c4-5bb5-410f-8366-c1cffd6c2c3e)
+## Fragments
 
-As you see, we consider the `childern` of the message box as pieces. Then we have a list of `FragProcessor` which take in charge of convert the list of HTML children (or you can say: list of pieces) into list of `MsgProcessInfo` object.
+As you see, we **consider the `childern` of the message box as a "fragment"**. Then we have **a list of `FragProcessor`, each takes in charge of render a certain type of fragments**.
 
-## MsgProcessInfo
+## Fragment Processor
 
-This refers to object like: `{mark:..., replace:...}`:
+Definition:
 
-- `mark` Determine how it looks like for Markdown Renderer.
-- `replace` Determine replace behaviour after markdown render process.
-
-This decide what this element looks like when passed to Markdown Renderer. For example, an element `<span>123</span>` should converted to:
-
-```js
-{mark: '123', replace: undefined}
+```typescript
+type FragmentProcessFunc = (
+    parent: HTMLElement,
+    element: HTMLElement,
+    index: number,
+) => FragmentProcessFuncRetType | undefined;
 ```
 
-And an element that should be replaced later `<img class="face-element__icon"></img>` could be converted to:
+When `render()` function is triggered, a provided list of Fragment Processor will be iterated from begin to end **respectively and preemptively**.
 
-```js
-{
-    mark: '<span id="some_placeholder"></span>', 
-    replace: (parent)=>{...}
+This means, for a single fragment, once a processor successfully returned a not `undefined` value *(actually it should be `FragmentProcessFuncRetType` obejct)*, the loop is end and the return value is used for this fragment.
+
+![Fragment Processor](https://github.com/user-attachments/assets/670dd3f2-7660-4a59-99bb-9e985f19d323)
+
+## Children Replacement
+
+Let's look into the return type of `FragmentProcessFunc`:
+
+```typescript
+interface FragmentProcessFuncRetType {
+    original: HTMLElement;
+    rendered: HTMLElement;
 }
 ```
 
-## FragmentProcessFunc
+As you see, it specified the `original` SPAN element, and a new `rendered` element. For now, we just replace the `original` child of `messageBox` with `rendered`.
 
-The work of generating `MsgProcessInfo` based on HTML pieces is done by a set of function with type `FragmentProcessFunc`.
-
-There is a list of `FragmentProcessFunc`. When iterating pieces, all `FragmentProcessFunc` inside the list will be **triggered from begin to end respectively and preemptively**, which means once a processor successfully returned a `MsgProcessInfo` object, process interrupt and program will continue with next piece.
-
------
-
-![image](https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/assets/61616918/04247260-f2eb-46f3-aae2-1dfa487d8312)
-
-
-After the process above, we will get a list of `MsgProcessInfo` object. What we need to do is:
-
-- First, accumulate all `mark` from the list, passed it to *Markdown Renderer*, then get a `renderedHtml`.
-- Iterating `replace` field of `MsgProcessInfo` list, if not `undefined`, execute the replace function.
+> **Notice**
+>
+> Keep in mind that the `original` HTML element passed to Fragment Processor could be directly updated. 
+> 
+> In some cases, Fragment Processor function may directly mutated the `original` HTML element due to performance or other consideration. In this case, `original===rendered` should be true in the returned `FragmentProcessFuncRetType`.
 
 # Rendered Flag
 
@@ -68,9 +69,22 @@ if (messageBox.classList.contains(markdownRenderedClassName)) {
 messageBox.classList.add(markdownRenderedClassName);
 ```
 
+# Global & MessageRendered Callback
+
+- For the task that need to be done directly after a message is rendered, put it at the end of `renderSingleMsgBox()` function.
+- For the task that need to be done after a whole rendering is finished, put it at the end of `renderer()` function.
+
+> TODO:
+>
+> Add a more general callback protocol and manager for rendering process.
+
 # Refs
 
 For more info about the process, check out source code file:
 
 - [msgpiece_processor.ts](/src/render/msgpiece_processor.ts)
 - [renderer.tsx](/src/renderer.tsx)
+
+For outdated doc:
+
+- [Message Rendering Process Doc 2.3.5](./msg_rendering_process_2.3.5.md)

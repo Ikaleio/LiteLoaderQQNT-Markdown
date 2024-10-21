@@ -81,7 +81,12 @@ function getMarkdownIns() {
 /**
  * Function type that used to process children elements inside QQNT message box.
  */
-type FragmentProcessFunc = (parent: HTMLElement, element: HTMLElement, index: number) => FragmentProcessFuncRetType | undefined;
+type FragmentProcessFunc = (
+    parent: HTMLElement,
+    element: HTMLElement,
+    index: number,
+) => FragmentProcessFuncRetType | undefined;
+
 
 interface FragmentProcessFuncRetType {
     original: HTMLElement;

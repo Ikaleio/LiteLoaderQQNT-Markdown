@@ -5,7 +5,7 @@
     "slug": "markdown_it",
     "icon": "./icon.png",
     "description": "为 QQNT 提供 Markdown 渲染",
-    "version": "2.3.5",
+    "version": "2.4.0",
     "authors": [
         {
             "name": "d0j1a_1701",
@@ -16,7 +16,7 @@
         "repo": "d0j1a1701/LiteLoaderQQNT-Markdown",
         "branch": "v4",
         "release": {
-            "tag": "2.3.5",
+            "tag": "2.4.0",
             "file": "Release.zip"
         }
     },
