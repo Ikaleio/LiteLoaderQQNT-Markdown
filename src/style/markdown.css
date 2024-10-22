@@ -194,3 +194,16 @@ button.mdit-show-origin-button {
     /* text-underline: auto; */
     border-width: 0px;
 }
+
+pre.mdit-fenced-code-block>code {
+    width: 100%;
+    display: block;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+@media (prefers-color-scheme: dark) {
+    pre.mdit-fenced-code-block>code {
+        color-scheme: dark;
+    }
+}

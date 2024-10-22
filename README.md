@@ -1,7 +1,9 @@
 # LiteLoaderQQNT-Markdown
 
-![GitHub Release](https://img.shields.io/github/v/release/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&logo=github) ![GitHub License](https://img.shields.io/github/license/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&color=blue) ![GitHub last commit](https://img.shields.io/github/last-commit/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&logo=github)
- ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&color=rgb(50%2C180%2C50))
+[![GitHub Release](https://img.shields.io/github/v/release/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&logo=github)](https://github.com/Ikaleio/LiteLoaderQQNT-Markdown/releases)
+[![GitHub License](https://img.shields.io/github/license/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&color=blue)](https://github.com/Ikaleio/LiteLoaderQQNT-Markdown/blob/v4/LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&logo=github)](https://github.com/Ikaleio/LiteLoaderQQNT-Markdown/commits/v4/)
+[![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&color=rgb(50%2C180%2C50))](https://github.com/Ikaleio/LiteLoaderQQNT-Markdown/issues)
 
 
 ## 简介
@@ -109,6 +111,17 @@ Normal test with HTML Entities & " ' < > .
 您可以查看本项目的 [Known Issue](/docs/known_issue.md) 查看已经发现以及仍未解决的问题。
 
 如果在使用插件时遇到问题，您可以通过 [发起 Issue](https://github.com/d0j1a1701/LiteLoaderQQNT-Markdown/issues/new) 向我们进行反馈。届时请尽可能附上诸如系统版本，插件列表， LiteLoaderQQNT 设置页版本信息截图等可以帮助分析问题的信息。如果你还安装了远程调试插件，可以再附上 Devtools 信息。
+
+## Contributors
+
+[![](https://contrib.rocks/image?repo=Ikaleio/LiteLoaderQQNT-Markdown)](https://github.com/Ikaleio/LiteLoaderQQNT-Markdown/graphs/contributors)
+
+## Star History
+
+![Stargazers over time](https://starchart.cc/Ikaleio/LiteLoaderQQNT-Markdown.svg?variant=adaptive)
+
+
+如果您觉得本项目对您有帮助，可以帮忙点一下Star，谢谢！
 
 ## Contributing
 

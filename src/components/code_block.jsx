@@ -33,7 +33,7 @@ export function HighLightedCodeBlock({ content, lang, markdownItIns }) {
         mditLogger('error', `hljs error:`, e);
     }
 
-    return (<pre className='hljs hl-code-block'>
+    return (<pre className='hljs hl-code-block mdit-fenced-code-block'>
         <button className='lang_copy'>
             <p className='lang'>{lang}</p>
             <p className='copy'>复制</p>

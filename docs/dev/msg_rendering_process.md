@@ -9,11 +9,32 @@
 
 # Workflow
 
-Currently the plugin does NOT rendering all content inside a message box. We only deal with contents that may need go through the markdown renderer. Also, since some element should NOT be considered as Markdown when rendering and should keep what it look like throughout the rendering, we introduced the concept of **Fragement Processor**(FragProcessor).
+Currently the plugin does NOT rendering all content inside a message box. We only deal with contents that may need go through the markdown renderer. Also, since some element should NOT be considered as Markdown when rendering and should keep what it look like throughout the rendering, we introduced the concept of **Fragment Processor** _(FragProcessor)_.
 
 ## Fragments
 
-As you see, we **consider the `childern` of the message box as a "fragment"**. Then we have **a list of `FragProcessor`, each takes in charge of render a certain type of fragments**.
+When dealing with QQNT messages, we considered a message `span` as a basic rendering unit. A general QQNT message HTML element has the folloing structure:
+
+```
+- span.mix-message__inner
+  - span.text_element
+    - span / p / ...
+  - span.text_element_at
+  - span.other_element
+```
+
+In conclusion:
+
+- A `span.mix-message__inner` is related to a single message box, we will use `msgBox` to refer to it below.
+- A `msgBox` could have multiple `span.*_element_*` span, which's classname indictas the content type of this span, for example, a pure text, an emoji or a image etc.
+
+Here, we **consider the `span` children of the msgBox as the "fragments" of this message**. Then we have **a list of `FragProcessor`, each takes in charge of catching and rendering a certain type of fragments**.
+
+For example, we could have:
+
+- `TextFragProcessor` who deal with `span.text-element` fragments.
+- `EmojiFragProcessor` who deal with emoji info in fragments.
+- ...
 
 ## Fragment Processor
 
@@ -27,7 +48,7 @@ type FragmentProcessFunc = (
 ) => FragmentProcessFuncRetType | undefined;
 ```
 
-When `render()` function is triggered, a provided list of Fragment Processor will be iterated from begin to end **respectively and preemptively**.
+When `render()` function is triggered, for **each fragment** in each message, a **provided list of Fragment Processor** will be iterated from begin to end **respectively and preemptively**.
 
 This means, for a single fragment, once a processor successfully returned a not `undefined` value *(actually it should be `FragmentProcessFuncRetType` obejct)*, the loop is end and the return value is used for this fragment.
 
@@ -46,7 +67,7 @@ interface FragmentProcessFuncRetType {
 
 As you see, it specified the `original` SPAN element, and a new `rendered` element. For now, we just replace the `original` child of `messageBox` with `rendered`.
 
-> **Notice**
+> [!note]
 >
 > Keep in mind that the `original` HTML element passed to Fragment Processor could be directly updated. 
 > 
