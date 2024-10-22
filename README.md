@@ -1,7 +1,9 @@
 # LiteLoaderQQNT-Markdown
 
-![GitHub Release](https://img.shields.io/github/v/release/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&logo=github) ![GitHub License](https://img.shields.io/github/license/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&color=blue) ![GitHub last commit](https://img.shields.io/github/last-commit/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&logo=github)
- ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&color=rgb(50%2C180%2C50))
+[![GitHub Release](https://img.shields.io/github/v/release/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&logo=github)](https://github.com/Ikaleio/LiteLoaderQQNT-Markdown/releases)
+[![GitHub License](https://img.shields.io/github/license/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&color=blue)](https://github.com/Ikaleio/LiteLoaderQQNT-Markdown/blob/v4/LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&logo=github)](https://github.com/Ikaleio/LiteLoaderQQNT-Markdown/commits/v4/)
+[![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/d0j1a1701/LiteLoaderQQNT-Markdown?style=for-the-badge&color=rgb(50%2C180%2C50))](https://github.com/Ikaleio/LiteLoaderQQNT-Markdown/issues)
 
 
 ## 简介
